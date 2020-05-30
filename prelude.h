@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef int (*stuff_t)(void *);
 #define stuff_method(_struct_name_) \
@@ -29,12 +30,20 @@ STUFF_IMPLS
 };
 #undef IMPL
 
+#define HAS_TRAITS(_struct_name_) \
+struct _struct_name_##_Prelude_Traits *prelude_traits[]
+
+#define TRAITS(_struct_name_) \
+struct _struct_name_##_Prelude_Traits
+
 typedef struct Foo {
     int i;
-    struct {
-        stuff_method(Foo);
-    } methods[];
+    HAS_TRAITS(Foo);
 } Foo;
+
+TRAITS(Foo) {
+  stuff_method(Foo);
+};
 
 inline int Foo__stuff(struct Foo *arg) {
   return arg->i;
@@ -42,8 +51,8 @@ inline int Foo__stuff(struct Foo *arg) {
 
 #define call_method(_arg_, _method_) \
   ((_method_##_impl_array[\
-    sizeof((_arg_)->methods[0]._method_[0](_arg_)) * 0 +\
-    sizeof((_arg_)->methods[0]._method_) / sizeof((_arg_)->methods[0]._method_[0])\
+    sizeof((_arg_)->prelude_traits[0]->_method_[0](_arg_)) * 0 +\
+    sizeof((_arg_)->prelude_traits[0]->_method_) / sizeof((_arg_)->prelude_traits[0]->_method_[0])\
   ]))(_arg_)
 
 #define stuff(_arg_) call_method(_arg_, stuff)

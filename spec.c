@@ -6,7 +6,8 @@ spec("prelude") {
 
   }
 
-  it("should work") {
-    check("foo")
+  it("should do stuff") {
+    Foo foo = {42};
+    check(stuff(&foo) == 42);
   }
 }
