@@ -24,19 +24,19 @@
       sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)[0]) \
   ])->_fn_(_value_, ##__VA_ARGS__)
 
-#define CALL_TRAIT_FUNCTION(_trait_, _fn_, _value_, ...) \
+#define invoke_(_trait_, _fn_, _value_, ...) \
   CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ##__VA_ARGS__)
 
 //////////////////////////////////////////
 
-// TODO Prefix trait struct field names to allow
-//      non-macro calls Shape(x)->area(x)
+#define TRAIT Shape
+
 #define TRAIT_FUNCTIONS(T)\
   TRAIT_FUNCTION(T, int, area,      (T *))\
   TRAIT_FUNCTION(T, int, perimeter, (T *))
 
-#define area(x)      CALL_TRAIT_FUNCTION(Shape, area,      x)
-#define perimeter(x) CALL_TRAIT_FUNCTION(Shape, perimeter, x)
+#define area_(x)      invoke_(Shape, area,      x)
+#define perimeter_(x) invoke_(Shape, perimeter, x)
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\

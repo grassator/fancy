@@ -8,13 +8,19 @@ spec("prelude") {
 
   it("should compute area of the rectangle") {
     Rect rect = {42, 10};
-    check(area(&rect) == 420);
-    check(perimeter(&rect) == 104);
+    check(area_(&rect) == 420);
+    check(perimeter_(&rect) == 104);
   }
 
   it("should compute area of the circle") {
     Circle circle = {10};
-    check(area(&circle) == 314);
-    check(perimeter(&circle) == 62);
+    check(area_(&circle) == 314);
+    check(perimeter_(&circle) == 62);
+  }
+
+  it("should support generic invoke_ calls") {
+    Circle circle = {10};
+    check(invoke_(Shape, area, &circle) == 314);
+    check(invoke_(Shape, perimeter, &circle) == 62);
   }
 }
