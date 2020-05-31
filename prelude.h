@@ -39,7 +39,8 @@
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
-  REGISTER_IMPLEMENTATION(Rect)
+  REGISTER_IMPLEMENTATION(Rect)\
+  REGISTER_IMPLEMENTATION(Circle)
 
 #include "trait_include.h"
 #undef TRAIT
@@ -62,6 +63,24 @@ int IMPL(Trait_Shape, area) (Self *rect) {
 
 int IMPL(Trait_Shape, perimeter)(Self *rect) {
   return rect->width * 2 + rect->height * 2;
+}
+#undef Self
+
+#define Self Circle
+typedef struct Self {
+    int radius;
+
+    BEGIN_TRAITS
+      HAS_TRAIT(Trait_Shape);
+    END_TRAITS
+} Self;
+
+int IMPL(Trait_Shape, area) (Self *self) {
+  return (int)(3.14 * self->radius * self->radius);
+}
+
+int IMPL(Trait_Shape, perimeter)(Self *self) {
+  return (int)(2.0 * 3.14 * self->radius);
 }
 #undef Self
 
