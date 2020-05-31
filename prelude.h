@@ -45,7 +45,7 @@
 
 //////////////////////////////////////////
 
-#define TRAIT Shape
+#define Self Shape
 
 #define TRAIT_FUNCTIONS(T)\
   TRAIT_FUNCTION(T, int, area,      (T *))\
@@ -61,9 +61,6 @@
   REGISTER_IMPLEMENTATION(Circle)
 
 #include "trait.h"
-#undef TRAIT
-
-#define Self Shape
 
 #define FIELDS(Self)\
   FIELD(const Trait__##Self *, trait)\

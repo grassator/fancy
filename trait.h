@@ -1,4 +1,4 @@
-#define TRAIT_NAME CONCAT(Trait__, TRAIT)
+#define TRAIT_NAME CONCAT(Trait__, Self)
 
 #define TRAIT_FUNCTION(_type_, _return_, _name_, ...) _return_ (*_name_##_) __VA_ARGS__;
 typedef struct {
