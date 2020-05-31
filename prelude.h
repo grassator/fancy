@@ -3,16 +3,14 @@
 
 // Common things for all traits
 
-#define CONCAT(a, b) CONCAT_HELPER(a, b)
 #define CONCAT_HELPER(a, b) a ## b
+#define CONCAT(a, b) CONCAT_HELPER(a, b)
 
-#define BEGIN_TRAITS struct {
-#define HAS_TRAIT(_trait_)\
-  CONCAT(Trait__##_trait_##__, Self) *Trait__##_trait_[DISPATCH_ENUM_ENTRY(Trait__##_trait_, Self)]
-#define END_TRAITS } *prelude_traits[];
+#define IMPL_HELPER(_trait_, _fn_, _type_) \
+ CONCAT(CONCAT(Trait__##_trait_##__, _type_),  __##_fn_)
 
 #define IMPL(_trait_, _fn_) \
- CONCAT(CONCAT(Trait__##_trait_##__, Self),  __##_fn_)
+ IMPL_HELPER(_trait_, _fn_, Self)
 
 #define GET_FAKE_TRAITS_ARRAY(_value_,_trait_) \
   (_value_)->prelude_traits[0]->_trait_
@@ -42,6 +40,9 @@
 #define invoke_(_trait_, _fn_, _value_, ...) \
   CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ##__VA_ARGS__)
 
+#define cast_to_trait_(_trait_, _value_) \
+  (const _trait_) {instance_(_trait_, _value_), _value_};
+
 //////////////////////////////////////////
 
 #define TRAIT Shape
@@ -55,51 +56,50 @@
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
+  REGISTER_IMPLEMENTATION(Shape)\
   REGISTER_IMPLEMENTATION(Rect)\
   REGISTER_IMPLEMENTATION(Circle)
 
-#include "trait_include.h"
-
-
-//typedef struct {
-  //Trait_Shape *trait;
-  //void *value;
-//} Shape;
-//
-//#define Self Shape
-//typedef struct Self {
-  //Trait_Shape *trait;
-  //void *value;
-//
-  //BEGIN_TRAITS
-    //HAS_TRAIT(Trait_Shape);
-  //END_TRAITS
-//} Self;
-//
-//inline int IMPL(Trait_Shape, area) (Self *self) {
-  //return self->trait->_area(self->value);
-//}
-//
-//inline int IMPL(Trait_Shape, perimeter)(Self *self) {
-  //return self->trait->_perimeter(self->value);
-//}
-//#undef Self
-
+#include "trait.h"
 #undef TRAIT
 
-/////////////////////////////
+#define Self Shape
+
+#define FIELDS(Self)\
+  FIELD(const Trait__##Self *, trait)\
+  FIELD(void *, value)
+
+#define TRAITS\
+  TRAIT(Self)
+
+#include "struct.h"
+
+inline int IMPL(Self, area) (Self *self) {
+  return self->trait->area(self->value);
+}
+
+inline int IMPL(Self, perimeter)(Self *self) {
+  return self->trait->perimeter(self->value);
+}
+#undef Self
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Rect
+//////////////////////////////////////////////////////////////////////////////
 
 #define Self Rect
-typedef struct Self {
-  int width;
-  int height;
 
-  BEGIN_TRAITS
-    HAS_TRAIT(Shape);
-  END_TRAITS
-} Self;
+#define FIELDS(Self)\
+  FIELD(int, width)\
+  FIELD(int, height)
 
-inline int IMPL(Shape, area) (Self *rect) {
+#define TRAITS\
+  TRAIT(Shape)
+
+#include "struct.h"
+
+inline int IMPL(Shape, area)(Self *rect) {
   return rect->width * rect->height;
 }
 
@@ -108,14 +108,19 @@ inline int IMPL(Shape, perimeter)(Self *rect) {
 }
 #undef Self
 
-#define Self Circle
-typedef struct Self {
-  int radius;
+//////////////////////////////////////////////////////////////////////////////
+// Circle
+//////////////////////////////////////////////////////////////////////////////
 
-  BEGIN_TRAITS
-    HAS_TRAIT(Shape);
-  END_TRAITS
-} Self;
+#define Self Circle
+
+#define FIELDS(Self)\
+  FIELD(int, radius)
+
+#define TRAITS\
+  TRAIT(Shape)
+
+#include "struct.h"
 
 inline int IMPL(Shape, area) (Self *self) {
   return (int)(3.14 * self->radius * self->radius);

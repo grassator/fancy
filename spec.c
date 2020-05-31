@@ -31,4 +31,11 @@ spec("prelude") {
     check(type_instance_(Shape, Circle)->area(&circle) == 314);
     check(type_instance_(Shape, Circle)->perimeter(&circle) == 62);
   }
+
+  it("should support virtual calls through the trait type") {
+    Circle circle = {10};
+    Shape shape = cast_to_trait_(Shape, &circle);
+    check(area_(&shape) == 314);
+    check(perimeter_(&shape) == 62);
+  }
 }
