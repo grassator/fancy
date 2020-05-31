@@ -45,14 +45,13 @@
 
 //////////////////////////////////////////
 
-#define Self Shape
 
-#define TRAIT_FUNCTIONS(T)\
-  TRAIT_FUNCTION(T, int, area,      (T *))\
-  TRAIT_FUNCTION(T, int, perimeter, (T *))
+#define TRAIT_FUNCTIONS(Self)\
+  TRAIT_FUNCTION(int, area,      Self)\
+  TRAIT_FUNCTION(int, perimeter, Self)
 
-#define area(x)      invoke(Shape, area,      x)
-#define perimeter(x) invoke(Shape, perimeter, x)
+#define area(self)      invoke(Shape, area,      self)
+#define perimeter(self) invoke(Shape, perimeter, self)
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
@@ -60,24 +59,9 @@
   REGISTER_IMPLEMENTATION(Rect)\
   REGISTER_IMPLEMENTATION(Circle)
 
+#define Self Shape
 #include "trait.h"
 
-#define FIELDS(Self)\
-  FIELD(const Trait__##Self *, trait)\
-  FIELD(void *, value)
-
-#define TRAITS\
-  TRAIT(Self)
-
-#include "struct.h"
-
-inline int IMPL(Self, area) (Self *self) {
-  return self->trait->area_(self->value);
-}
-
-inline int IMPL(Self, perimeter)(Self *self) {
-  return self->trait->perimeter_(self->value);
-}
 #undef Self
 
 
