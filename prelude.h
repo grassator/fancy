@@ -17,12 +17,27 @@
 #define GET_FAKE_TRAITS_ARRAY(_value_,_trait_) \
   (_value_)->prelude_traits[0]->_trait_
 
+#define GET_INSTANCE(_trait_, _value_) \
+  (Trait__##_trait_##_Implementation_Lookup_Table[ \
+    sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)) / \
+    sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)[0]) \
+  ])
+
 #define CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ...) \
   (Trait__##_trait_##_Implementation_Lookup_Table[ \
     sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)[0]->_fn_(_value_, ##__VA_ARGS__)) * 0 + \
     sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)) / \
       sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)[0]) \
   ])->_fn_(_value_, ##__VA_ARGS__)
+
+#define instance_(_trait_, _value_) \
+  GET_INSTANCE(_trait_, _value_)
+
+#define TYPE_INSTANCE_HELPER(_trait_, _type_) \
+  ((Trait__##_trait_##__##_type_ *) GET_INSTANCE(_trait_, ((_type_ *)0)))
+
+#define type_instance_(_trait_, _type_) \
+  TYPE_INSTANCE_HELPER(_trait_, _type_)
 
 #define invoke_(_trait_, _fn_, _value_, ...) \
   CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ##__VA_ARGS__)
