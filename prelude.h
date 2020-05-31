@@ -24,7 +24,7 @@
   ])->_fn_(_value_, ##__VA_ARGS__)
 
 #define CALL_TRAIT_FUNCTION(_trait_, _fn_, _value_, ...) \
-  CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, __VA_ARGS__)
+  CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ##__VA_ARGS__)
 
 //////////////////////////////////////////
 
@@ -57,11 +57,11 @@ typedef struct Self {
     END_TRAITS
 } Self;
 
-int IMPL(Trait_Shape, area) (Self *rect) {
+inline int IMPL(Trait_Shape, area) (Self *rect) {
   return rect->width * rect->height;
 }
 
-int IMPL(Trait_Shape, perimeter)(Self *rect) {
+inline int IMPL(Trait_Shape, perimeter)(Self *rect) {
   return rect->width * 2 + rect->height * 2;
 }
 #undef Self
@@ -75,11 +75,11 @@ typedef struct Self {
     END_TRAITS
 } Self;
 
-int IMPL(Trait_Shape, area) (Self *self) {
+inline int IMPL(Trait_Shape, area) (Self *self) {
   return (int)(3.14 * self->radius * self->radius);
 }
 
-int IMPL(Trait_Shape, perimeter)(Self *self) {
+inline int IMPL(Trait_Shape, perimeter)(Self *self) {
   return (int)(2.0 * 3.14 * self->radius);
 }
 #undef Self
