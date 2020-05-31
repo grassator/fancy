@@ -1,6 +1,6 @@
 #define TRAIT_NAME CONCAT(Trait__, TRAIT)
 
-#define TRAIT_FUNCTION(_type_, _return_, _name_, ...) _return_ (*_name_) __VA_ARGS__;
+#define TRAIT_FUNCTION(_type_, _return_, _name_, ...) _return_ (*_name_##_) __VA_ARGS__;
 typedef struct {
   TRAIT_FUNCTIONS(void)
 } TRAIT_NAME;
@@ -20,7 +20,7 @@ enum {
 TRAIT_IMPLEMENTATIONS
 #undef REGISTER_IMPLEMENTATION
 
-#define TRAIT_FUNCTION(_type_, _return_, _name_, ...) _return_ (*_name_) __VA_ARGS__;
+#define TRAIT_FUNCTION(_type_, _return_, _name_, ...) _return_ (*_name_##_) __VA_ARGS__;
 #define REGISTER_IMPLEMENTATION(_struct_name_)\
   typedef struct { \
     TRAIT_FUNCTIONS(_struct_name_)\

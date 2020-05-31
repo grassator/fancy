@@ -28,20 +28,20 @@
       sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)[0]) \
   ])->_fn_(_value_, ##__VA_ARGS__)
 
-#define instance_(_trait_, _value_) \
+#define instance(_trait_, _value_) \
   GET_INSTANCE(_trait_, _value_)
 
 #define TYPE_INSTANCE_HELPER(_trait_, _type_) \
   ((Trait__##_trait_##__##_type_ *) GET_INSTANCE(_trait_, ((_type_ *)0)))
 
-#define type_instance_(_trait_, _type_) \
+#define type_instance(_trait_, _type_) \
   TYPE_INSTANCE_HELPER(_trait_, _type_)
 
-#define invoke_(_trait_, _fn_, _value_, ...) \
-  CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ##__VA_ARGS__)
+#define invoke(_trait_, _fn_, _value_, ...) \
+  CALL_TRAIT_FUNCTION_HELPER(_trait_, CONCAT(_fn_, _), _value_, ##__VA_ARGS__)
 
-#define cast_to_trait_(_trait_, _value_) \
-  (const _trait_) {instance_(_trait_, _value_), _value_};
+#define cast_to_trait(_trait_, _value_) \
+  (const _trait_) {instance(_trait_, _value_), _value_};
 
 //////////////////////////////////////////
 
@@ -51,8 +51,8 @@
   TRAIT_FUNCTION(T, int, area,      (T *))\
   TRAIT_FUNCTION(T, int, perimeter, (T *))
 
-#define area_(x)      invoke_(Shape, area,      x)
-#define perimeter_(x) invoke_(Shape, perimeter, x)
+#define area(x)      invoke(Shape, area,      x)
+#define perimeter(x) invoke(Shape, perimeter, x)
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
@@ -75,11 +75,11 @@
 #include "struct.h"
 
 inline int IMPL(Self, area) (Self *self) {
-  return self->trait->area(self->value);
+  return self->trait->area_(self->value);
 }
 
 inline int IMPL(Self, perimeter)(Self *self) {
-  return self->trait->perimeter(self->value);
+  return self->trait->perimeter_(self->value);
 }
 #undef Self
 
