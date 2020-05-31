@@ -1,59 +1,64 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef int (*stuff_t)(void *);
-#define stuff_method(_struct_name_) \
-  int (*stuff[Stuff_Dispatch_Offset_##_struct_name_])(struct _struct_name_ *)
+// Common things for all traits
 
-#define STUFF_IMPLS\
-  IMPL(Foo)
+#define CONCAT(a, b) CONCAT_HELPER(a, b)
+#define CONCAT_HELPER(a, b) a ## b
 
-#define IMPL(_struct_name_) Stuff_Dispatch_Offset_##_struct_name_,
-typedef enum {
-  Stuff_Dispatch_Offset_,
-  STUFF_IMPLS
-} Stuff_Dispatch_Offset;
-#undef IMPL
+#define BEGIN_TRAITS struct {
+#define HAS_TRAIT(_trait_)\
+  CONCAT(_trait_##__, Self) *_trait_[DISPATCH_ENUM_ENTRY(_trait_, Self)]
+#define END_TRAITS } *prelude_traits[];
 
-#define IMPL(_struct_name_) struct _struct_name_;
-STUFF_IMPLS
-#undef IMPL
+#define IMPL(_trait_, _fn_) \
+ CONCAT(CONCAT(_trait_##__, Self),  __##_fn_)
 
-#define IMPL(_struct_name_) inline int _struct_name_##__stuff(struct _struct_name_ *arg);
-STUFF_IMPLS
-#undef IMPL
+#define GET_FAKE_TRAITS_ARRAY(_value_,_trait_) \
+  (_value_)->prelude_traits[0]->_trait_
 
-#define IMPL(_struct_name_) [Stuff_Dispatch_Offset_##_struct_name_] = (stuff_t)_struct_name_##__stuff,
-static const stuff_t stuff_impl_array[] = {
-  0,
-STUFF_IMPLS
-};
-#undef IMPL
+#define CALL_TRAIT_FUNCTION(_trait_, _fn_, _value_, ...) \
+  (_trait_##_Implementation_Lookup_Table[ \
+    sizeof(GET_FAKE_TRAITS_ARRAY(_value_,_trait_)[0]->_fn_(_value_, ##__VA_ARGS__)) * 0 + \
+    sizeof(GET_FAKE_TRAITS_ARRAY(_value_,_trait_)) / sizeof(GET_FAKE_TRAITS_ARRAY(_value_,_trait_)[0]) \
+  ])->_fn_(_value_, ##__VA_ARGS__)
 
-#define HAS_TRAITS(_struct_name_) \
-struct _struct_name_##_Prelude_Traits *prelude_traits[]
+//////////////////////////////////////////
 
-#define TRAITS(_struct_name_) \
-struct _struct_name_##_Prelude_Traits
+#define TRAIT Trait_Shape
 
-typedef struct Foo {
-    int i;
-    HAS_TRAITS(Foo);
-} Foo;
+#define TRAIT_FUNCTIONS(_type_)\
+  TRAIT_FUNCTION(_type_, int, area,      (_type_ *))\
+  TRAIT_FUNCTION(_type_, int, perimeter, (_type_ *))
 
-TRAITS(Foo) {
-  stuff_method(Foo);
-};
+#define area(_value_, ...) CALL_TRAIT_FUNCTION(Trait_Shape, area, _value_, ##__VA_ARGS__)
+#define perimeter(_value_, ...) CALL_TRAIT_FUNCTION(Trait_Shape, perimeter, _value_, ##__VA_ARGS__)
 
-inline int Foo__stuff(struct Foo *arg) {
-  return arg->i;
+// Users need to register here
+#define TRAIT_IMPLEMENTATIONS(_trait_)\
+  REGISTER_IMPLEMENTATION(_trait_, Rect)
+
+#include "trait_include.h"
+#undef TRAIT
+
+/////////////////////////////
+
+#define Self Rect
+typedef struct Self {
+    int width;
+    int height;
+
+    BEGIN_TRAITS
+      HAS_TRAIT(Trait_Shape);
+    END_TRAITS
+} Self;
+
+int IMPL(Trait_Shape, area) (Self *rect) {
+  return rect->width * rect->height;
 }
 
-#define call_method(_arg_, _method_) \
-  ((_method_##_impl_array[\
-    sizeof((_arg_)->prelude_traits[0]->_method_[0](_arg_)) * 0 +\
-    sizeof((_arg_)->prelude_traits[0]->_method_) / sizeof((_arg_)->prelude_traits[0]->_method_[0])\
-  ]))(_arg_)
-
-#define stuff(_arg_) call_method(_arg_, stuff)
+int IMPL(Trait_Shape, perimeter)(Self *rect) {
+  return rect->width * 2 + rect->height * 2;
+}
+#undef Self
 

@@ -6,8 +6,9 @@ spec("prelude") {
 
   }
 
-  it("should do stuff") {
-    Foo foo = {42};
-    check(stuff(&foo) == 42);
+  it("should compute area of the rectangle") {
+    Rect rect = {42, 10};
+    check(area(&rect) == 420);
+    check(perimeter(&rect) == 104);
   }
 }
