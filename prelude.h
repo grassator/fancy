@@ -17,26 +17,29 @@
 #define GET_FAKE_TRAITS_ARRAY(_value_,_trait_) \
   (_value_)->prelude_traits[0]->_trait_
 
-#define CALL_TRAIT_FUNCTION(_trait_, _fn_, _value_, ...) \
+#define CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ...) \
   (_trait_##_Implementation_Lookup_Table[ \
     sizeof(GET_FAKE_TRAITS_ARRAY(_value_,_trait_)[0]->_fn_(_value_, ##__VA_ARGS__)) * 0 + \
     sizeof(GET_FAKE_TRAITS_ARRAY(_value_,_trait_)) / sizeof(GET_FAKE_TRAITS_ARRAY(_value_,_trait_)[0]) \
   ])->_fn_(_value_, ##__VA_ARGS__)
 
+#define CALL_TRAIT_FUNCTION(_trait_, _fn_, _value_, ...) \
+  CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, __VA_ARGS__)
+
 //////////////////////////////////////////
 
 #define TRAIT Trait_Shape
 
-#define TRAIT_FUNCTIONS(_type_)\
-  TRAIT_FUNCTION(_type_, int, area,      (_type_ *))\
-  TRAIT_FUNCTION(_type_, int, perimeter, (_type_ *))
+#define TRAIT_FUNCTIONS(T)\
+  TRAIT_FUNCTION(T, int, area,      (T *))\
+  TRAIT_FUNCTION(T, int, perimeter, (T *))
 
-#define area(_value_, ...) CALL_TRAIT_FUNCTION(Trait_Shape, area, _value_, ##__VA_ARGS__)
-#define perimeter(_value_, ...) CALL_TRAIT_FUNCTION(Trait_Shape, perimeter, _value_, ##__VA_ARGS__)
+#define area(x)      CALL_TRAIT_FUNCTION(Trait_Shape, area,      x)
+#define perimeter(x) CALL_TRAIT_FUNCTION(Trait_Shape, perimeter, x)
 
 // Users need to register here
-#define TRAIT_IMPLEMENTATIONS(_trait_)\
-  REGISTER_IMPLEMENTATION(_trait_, Rect)
+#define TRAIT_IMPLEMENTATIONS\
+  REGISTER_IMPLEMENTATION(Rect)
 
 #include "trait_include.h"
 #undef TRAIT
