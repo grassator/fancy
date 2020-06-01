@@ -18,7 +18,12 @@ TRAITS
 #ifndef TRAIT_NAME
 inline const Type_Info_Struct * IMPL(Type_Info, type_info)(Self *self) {
   static const Type_Info_Struct_Field fields[] = {
-    #define FIELD(_type_, _name_) { STRINGIFY(_name_), STRINGIFY(_type_) },
+    #define FIELD(_type_, _name_) { \
+      .name = STRINGIFY(_name_), \
+      .type = STRINGIFY(_type_), \
+      .size = sizeof(_type_), \
+      .offset = offsetof(Self, _name_), \
+    },
     FIELDS(Self)
     #undef FIELD
   };

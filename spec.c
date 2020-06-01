@@ -39,7 +39,7 @@ spec("prelude") {
     check(perimeter(&shape) == 62);
   }
 
-  it("should stringify Rect field") {
+  it("should stringified Type_Info") {
     Rect rect = {42, 10};
     //printf("%s", type_info_to_c_string(type_info(&rect)));
     const char *type_info_string = type_info_to_c_string(type_info(&rect));

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 // Common things for all traits
 
@@ -55,6 +56,8 @@
 typedef struct {
   const char *name;
   const char *type;
+  size_t size;
+  size_t offset;
 } Type_Info_Struct_Field;
 
 typedef struct {
@@ -82,6 +85,7 @@ typedef struct {
 const char *type_info_to_c_string(const Type_Info_Struct *struct_) {
   const size_t size = 4000;
   char *buffer = malloc(size);
+
   buffer[0] = 0;
   strcat_s(buffer, size, struct_->name);
   strcat_s(buffer, size, " { ");
