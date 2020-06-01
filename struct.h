@@ -15,6 +15,23 @@ TRAITS
   } *prelude_traits[];
 } Self;
 
+#ifndef TRAIT_NAME
+inline const Type_Info_Struct * IMPL(Type_Info, type_info)(Self *self) {
+  static const Type_Info_Struct_Field fields[] = {
+    #define FIELD(_type_, _name_) { STRINGIFY(_name_), STRINGIFY(_type_) },
+    FIELDS(Self)
+    #undef FIELD
+  };
+
+  static const Type_Info_Struct struct_ = {
+    .name = STRINGIFY(Self),
+    .fields = fields,
+    .field_count = static_array_size(fields),
+  };
+  return &struct_;
+}
+#endif
+
 #undef TRAIT_HELPER
 #undef FIELDS_HELPER
 #undef FIELDS
