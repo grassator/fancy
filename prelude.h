@@ -28,10 +28,12 @@
   ])
 
 #define CALL_TRAIT_FUNCTION_HELPER(_trait_, _fn_, _value_, ...) \
-  (Trait__##_trait_##_Implementation_Lookup_Table[ \
-    sizeof(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)[0]->_fn_(_value_, ##__VA_ARGS__)) * 0 + \
-    static_array_size(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_))\
-  ])->_fn_(_value_, ##__VA_ARGS__)
+  ( \
+    0 ? (GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_)[0]->_fn_(_value_, ##__VA_ARGS__)) \
+    : ((Trait__##_trait_##_Implementation_Lookup_Table[ \
+      static_array_size(GET_FAKE_TRAITS_ARRAY(_value_,Trait__##_trait_))\
+    ])->_fn_(_value_, ##__VA_ARGS__)) \
+  )
 
 #define instance(_trait_, _value_) \
   GET_INSTANCE(_trait_, _value_)
@@ -53,21 +55,82 @@
 // Type_Info
 //////////////////////////////////////////////////////////////////////////////
 
+typedef enum {
+  Type_Info_Type_Tag_Void,
+  Type_Info_Type_Tag_Integer,
+  Type_Info_Type_Tag_Struct,
+  Type_Info_Type_Tag_Pointer,
+  Type_Info_Type_Tag_Array,
+  Type_Info_Type_Tag_Enum,
+} Type_Info_Type_Tag;
+
+typedef struct Type_Info_Qualified_Type Type_Info_Qualified_Type;
+
 typedef struct {
   const char *name;
-  const char *type;
-  size_t size;
-  size_t offset;
+  const Type_Info_Qualified_Type *qualified_type;
+  const char *type_string;
+
+  uint32_t size;
+  uint32_t offset;
 } Type_Info_Struct_Field;
 
 typedef struct {
-  const char *name;
   const Type_Info_Struct_Field *fields;
-  size_t field_count;
+  uint32_t field_count;
 } Type_Info_Struct;
 
+typedef enum {
+  Type_Info_Integer_Signed,
+  Type_Info_Integer_Unsigned,
+} Type_Info_Integer_Signedness;
+
+typedef struct {
+  const char *name;
+  Type_Info_Integer_Signedness signedness;
+  uint32_t size;
+} Type_Info_Integer;
+
+typedef struct {
+  const char *name;
+  int64_t value;
+} Type_Info_Enum_Item;
+
+typedef struct {
+  Type_Info_Integer *integer_type;
+  Type_Info_Enum_Item *items;
+  uint32_t item_count;
+} Type_Info_Enum;
+
+typedef struct Type_Info_Type {
+  Type_Info_Type_Tag tag;
+  const char *name;
+  union {
+    const Type_Info_Integer integer;
+    const Type_Info_Struct struct_;
+  };
+} Type_Info_Type;
+
+typedef struct Type_Info_Qualified_Type {
+  const Type_Info_Type *type;
+  uint32_t pointer_indirection_1 : 1;
+  uint32_t pointer_indirection_2 : 1;
+  uint32_t pointer_indirection_3 : 1;
+  uint32_t pointer_indirection_4 : 1;
+  bool is_const;
+} Type_Info_Qualified_Type;
+
+const Type_Info_Type type_info_int = {
+  .tag = Type_Info_Type_Tag_Integer,
+  .name = "int",
+  .integer = {
+    .signedness = Type_Info_Integer_Signed,
+    .size = sizeof(int),
+  }
+};
+
 #define TRAIT_FUNCTIONS(Self)\
-  TRAIT_FUNCTION(const Type_Info_Struct *, type_info, Self)
+  TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self)
 
 #define type_info(self) invoke(Type_Info, type_info, self)
 
@@ -82,15 +145,25 @@ typedef struct {
 #include "trait.h"
 #undef Self
 
-const char *type_info_to_c_string(const Type_Info_Struct *struct_) {
+const char *type_info_to_c_string(const Type_Info_Type *type) {
   const size_t size = 4000;
   char *buffer = malloc(size);
 
   buffer[0] = 0;
-  strcat_s(buffer, size, struct_->name);
+  strcat_s(buffer, size, type->name);
+  const Type_Info_Struct *struct_ = &type->struct_;
   strcat_s(buffer, size, " { ");
   for (size_t i = 0; i < struct_->field_count; ++i) {
-    strcat_s(buffer, size, struct_->fields[i].type);
+    if (struct_->fields[i].qualified_type->is_const) {
+      strcat_s(buffer, size, "const ");
+    }
+    strcat_s(buffer, size, struct_->fields[i].qualified_type->type->name);
+    if (struct_->fields[i].qualified_type->pointer_indirection_1) {
+      strcat_s(buffer, size, "*");
+    }
+    if (struct_->fields[i].qualified_type->pointer_indirection_2) {
+      strcat_s(buffer, size, "*");
+    }
     strcat_s(buffer, size, " ");
     strcat_s(buffer, size, struct_->fields[i].name);
     strcat_s(buffer, size, "; ");
@@ -130,7 +203,8 @@ const char *type_info_to_c_string(const Type_Info_Struct *struct_) {
 
 #define FIELDS(Self)\
   FIELD(int, width)\
-  FIELD(int, height)
+  FIELD(int, height)\
+  //FIELD(CONST(PTR(PTR(int))), dummy)
 
 #define TRAITS\
   TRAIT(Shape)\
