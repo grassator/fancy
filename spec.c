@@ -1,5 +1,11 @@
 #include "bdd-for-c.h"
 #include "prelude.h"
+#include <malloc.h>
+
+typedef struct {
+  void (*fn)(void *);
+  void *handle;
+} Closer;
 
 spec("prelude") {
   it("should compute area of the rectangle") {
@@ -43,6 +49,6 @@ spec("prelude") {
     Rect rect = {42, 10};
     //printf("%s", type_info_to_c_string(type_info(&rect)));
     const char *type_info_string = type_info_to_c_string(type_info(&rect));
-    check(strcmp(type_info_string, "Rect { int width; int height; const int **dummy[10]; }") == 0);
+    check(strcmp(type_info_string, "Rect { int width; int height; const int **dummy[10][21]; }") == 0);
   }
 }

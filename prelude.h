@@ -24,38 +24,94 @@
 #define FIELD_INFO_ARG0(_type_, _name_)\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags) };
+
 #define FIELD_INFO_ARG1(_type_, _name_, N1)\
-  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
+    = {N1, 0};\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+
 #define FIELD_INFO_ARG2(_type_, _name_, N1, N2)\
-  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_2)\
+    = {N2, 0};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
+    = {N1, &CONCAT(_name_, _type_info_array_2)};\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+
 #define FIELD_INFO_ARG3(_type_, _name_, N1, N2, N3)\
-  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_3)\
+    = {N3, 0};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_2)\
+    = {N2, &CONCAT(_name_, _type_info_array_3)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
+    = {N1, &CONCAT(_name_, _type_info_array_2)};\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+
 #define FIELD_INFO_ARG4(_type_, _name_, N1, N2, N3, N4)\
-  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_4)\
+    = {N4, 0};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_3)\
+    = {N3, &CONCAT(_name_, _type_info_array_4)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_2)\
+    = {N2, &CONCAT(_name_, _type_info_array_3)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
+    = {N1, &CONCAT(_name_, _type_info_array_2)};\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+
 #define FIELD_INFO_ARG5(_type_, _name_, N1, N2, N3, N4, N5)\
-  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_5)\
+    = {N5, 0};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_4)\
+    = {N4, &CONCAT(_name_, _type_info_array_5)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_3)\
+    = {N3, &CONCAT(_name_, _type_info_array_4)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_2)\
+    = {N2, &CONCAT(_name_, _type_info_array_3)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
+    = {N1, &CONCAT(_name_, _type_info_array_2)};\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+
 #define FIELD_INFO_ARG6(_type_, _name_, N1, N2, N3, N4, N5, N6)\
-  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_6)\
+    = {N6, 0};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_5)\
+    = {N5, &CONCAT(_name_, _type_info_array_6)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_4)\
+    = {N4, &CONCAT(_name_, _type_info_array_5)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_3)\
+    = {N3, &CONCAT(_name_, _type_info_array_4)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_2)\
+    = {N2, &CONCAT(_name_, _type_info_array_3)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
+    = {N1, &CONCAT(_name_, _type_info_array_2)};\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+
 #define FIELD_INFO_ARG7(_type_, _name_, N1, N2, N3, N4, N5, N6, N7)\
-  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_7)\
+    = {N7, 0};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_6)\
+    = {N6, &CONCAT(_name_, _type_info_array_7)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_5)\
+    = {N5, &CONCAT(_name_, _type_info_array_6)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_4)\
+    = {N4, &CONCAT(_name_, _type_info_array_5)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_3)\
+    = {N3, &CONCAT(_name_, _type_info_array_4)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_2)\
+    = {N2, CONCAT(_name_, _type_info_array_3)};\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
+    = {N1, &CONCAT(_name_, _type_info_array_2)};\
   static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
     = { _type_, .flags = &CONCAT(_name_, _flags), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
@@ -284,7 +340,7 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 #define FIELDS(Self)\
   FIELD(TYPE(int), width)\
   FIELD(TYPE(int), height)\
-  FIELD(CONST(PTR(PTR(TYPE(int)))), dummy, 10)
+  FIELD(CONST(PTR(PTR(TYPE(int)))), dummy, 10, 21)
 
 #define TRAITS\
   TRAIT(Shape)\
