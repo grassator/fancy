@@ -280,7 +280,7 @@ const Type_Info_Type int__type_info = {
 #define TRAIT_IMPLEMENTATIONS\
   REGISTER_IMPLEMENTATION(Type_Info)\
   REGISTER_IMPLEMENTATION(Rect)\
-  //REGISTER_IMPLEMENTATION(Circle)
+  REGISTER_IMPLEMENTATION(Circle)
 
 #define Self Type_Info
 #include "trait.h"
@@ -381,7 +381,8 @@ inline int IMPL(Shape, perimeter)(Self *self) {
   FIELD(TYPE(int), radius)
 
 #define TRAITS\
-  TRAIT(Shape)
+  TRAIT(Shape)\
+  TRAIT(Type_Info)
 
 #include "struct.h"
 
