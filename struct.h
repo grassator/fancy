@@ -2,24 +2,26 @@
 // Anonymous unions and structs in declaration is only compatible with C11,
 // but it is also a known GNU extension and is supported in a bunch of
 // compilers that otherwise do not support C11.
-typedef union Self {
-  struct {
-#undef CONST
-#define TYPE(_type_) _type_
-#define CONST(_type_) const _type_
-#define PTR(_type_)_type_*
-#define FIELD(...) MSVC_MACRO_EXPAND(FIELD_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
-FIELDS_HELPER(Self)
-#undef FIELD
-#undef CONST
-#undef PTR
-#undef TYPE
+typedef struct Self {
+  union {
+    struct {
+  #undef CONST
+  #define TYPE(_type_) _type_
+  #define CONST(_type_) const _type_
+  #define PTR(_type_)_type_*
+  #define FIELD(...) MSVC_MACRO_EXPAND(FIELD_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
+  FIELDS_HELPER(Self)
+  #undef FIELD
+  #undef CONST
+  #undef PTR
+  #undef TYPE
+    };
+    struct {
+  #define TRAIT(_trait_) TRAIT_HELPER(_trait_, Self)
+  TRAITS
+  #undef TRAIT
+    } **prelude_traits;
   };
-  struct {
-#define TRAIT(_trait_) TRAIT_HELPER(_trait_, Self)
-TRAITS
-#undef TRAIT
-  } **prelude_traits;
 } Self;
 
 #ifndef TRAIT_NAME
@@ -36,8 +38,7 @@ FIELDS_HELPER(Self)
 #undef TYPE
 
 // Define field flags constants
-#define TYPE(_type_) CONCAT(_type_, __type_info)
-#define int &int
+#define TYPE(_type_) &CONCAT(_type_, __type_info)
 #define CONST(_type_) _type_
 #define PTR(_type_) _type_
 #define FIELD(...) MSVC_MACRO_EXPAND(FIELD_INFO_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
@@ -45,7 +46,6 @@ FIELDS_HELPER(Self)
 #undef FIELD
 #undef CONST
 #undef PTR
-#undef int
 #undef TYPE
 
 // TODO the ##__VA_ARGS__ here is not C99 compatible,
@@ -69,6 +69,7 @@ static const Type_Info_Struct_Field CONCAT(Self, __fields)[] = {
 };
 
 static const Type_Info_Type CONCAT(Self, __type_info) = {
+  .tag = Type_Info_Tag_Struct,
   .name = STRINGIFY(Self),
   .struct_ = {
     .fields = CONCAT(Self, __fields),

@@ -46,9 +46,17 @@ spec("prelude") {
   }
 
   it("should stringified Type_Info") {
-    Rect rect = {42, 10};
-    //printf("%s", type_info_to_c_string(type_info(&rect)));
+    Rect rect = {{42, 10}};
     const char *type_info_string = type_info_to_c_string(type_info(&rect));
-    check(strcmp(type_info_string, "Rect { int width; int height; const int **dummy[10][21]; }") == 0);
+    check(strcmp(type_info_string, "Rect { Geometry_Size size; const int **dummy[10][21]; }") == 0);
+  }
+
+  it("should be able to print a value") {
+    Rect rect = {{42, 10}};
+    print(&rect);
+    printf("\n");
+    Circle circle = {10};
+    print(&circle);
+    printf("\n");
   }
 }

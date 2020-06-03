@@ -1,4 +1,5 @@
 #ifndef MACRO_DEBUG
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -186,7 +187,7 @@
   CALL_TRAIT_FUNCTION_HELPER(_trait_, CONCAT(_fn_, _), _value_, ##__VA_ARGS__)
 
 #define cast_to_trait(_trait_, _value_) \
-  (const _trait_) {instance(_trait_, _value_), _value_};
+  ((const _trait_) {instance(_trait_, _value_), _value_})
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -194,13 +195,13 @@
 //////////////////////////////////////////////////////////////////////////////
 
 typedef enum {
-  Type_Info_Type_Tag_Void,
-  Type_Info_Type_Tag_Integer,
-  Type_Info_Type_Tag_Struct,
-  Type_Info_Type_Tag_Pointer,
-  Type_Info_Type_Tag_Array,
-  Type_Info_Type_Tag_Enum,
-} Type_Info_Type_Tag;
+  Type_Info_Tag_Void,
+  Type_Info_Tag_Integer,
+  Type_Info_Tag_Struct,
+  Type_Info_Tag_Pointer,
+  Type_Info_Tag_Array,
+  Type_Info_Tag_Enum,
+} Type_Info_Tag;
 
 typedef struct Type_Info_Qualified_Type Type_Info_Qualified_Type;
 
@@ -241,7 +242,7 @@ typedef struct {
 } Type_Info_Enum;
 
 typedef struct Type_Info_Type {
-  Type_Info_Type_Tag tag;
+  Type_Info_Tag tag;
   const char *name;
   union {
     const Type_Info_Integer integer;
@@ -261,30 +262,87 @@ typedef struct Type_Info_Qualified_Type {
 } Type_Info_Qualified_Type;
 
 const Type_Info_Type int__type_info = {
-  .tag = Type_Info_Type_Tag_Integer,
+  .tag = Type_Info_Tag_Integer,
   .name = "int",
-  .integer = {
-    .signedness = Type_Info_Integer_Signed,
-    .size = sizeof(int),
-  }
+  .integer = { .signedness = Type_Info_Integer_Signed, .size = sizeof(int), }
 };
 
+const Type_Info_Type char__type_info = {
+  .tag = Type_Info_Tag_Integer,
+  .name = "char",
+  .integer = { .signedness = Type_Info_Integer_Signed, .size = sizeof(char), }
+};
 
 #define TRAIT_FUNCTIONS(Self)\
   TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self)
 
 #define type_info(self) invoke(Type_Info, type_info, self)
+#define print(self) print_from_type_info(self, type_info(self))
 
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
   REGISTER_IMPLEMENTATION(Type_Info)\
   REGISTER_IMPLEMENTATION(Rect)\
-  REGISTER_IMPLEMENTATION(Circle)
+  REGISTER_IMPLEMENTATION(Circle)\
+  REGISTER_IMPLEMENTATION(Geometry_Size)
 
 #define Self Type_Info
 #include "trait.h"
 #undef Self
+
+void print_from_type_info(void *self, const Type_Info_Type *type) {
+  switch (type->tag) {
+    case Type_Info_Tag_Integer: {
+      int64_t to_print = 0;
+      switch(type->integer.size) {
+        case 8: {
+          to_print = *((int64_t *)self);
+          break;
+        }
+        case 4: {
+          to_print = *((int32_t *)self);
+          break;
+        }
+        case 2: {
+          to_print = *((int16_t *)self);
+          break;
+        }
+        case 1: {
+          to_print = *((int8_t *)self);
+          break;
+        }
+        default: {
+          assert(!"Unknown integer size");
+        }
+      }
+      if (type->integer.signedness == Type_Info_Integer_Signed) {
+        printf("%lld", to_print);
+      } else {
+        printf("%llu", (uint64_t)to_print);
+      }
+      break;
+    }
+    case Type_Info_Tag_Struct: {
+      const Type_Info_Struct *struct_ = &type->struct_;
+      printf("%s { ", type->name);
+      for (size_t i = 0; i < struct_->field_count; ++i) {
+        if (i != 0) printf(", ");
+        const Type_Info_Struct_Field *field = &struct_->fields[i];
+        const Type_Info_Type *field_type = field->qualified_type->type;
+        void *field_value = (uint8_t *)self + field->offset;
+        // FIXME should limit this recursion
+        print_from_type_info(field_value, field_type);
+      }
+      printf(" }");
+      break;
+    }
+    default: {
+      assert(!"Not implemented");
+      break;
+    }
+  }
+}
 
 const char *type_info_to_c_string(const Type_Info_Type *type) {
   const size_t size = 4000;
@@ -293,32 +351,46 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
   char *buffer = malloc(size);
 
   buffer[0] = 0;
-  strcat_s(buffer, size, type->name);
-  const Type_Info_Struct *struct_ = &type->struct_;
-  strcat_s(buffer, size, " { ");
-  for (size_t i = 0; i < struct_->field_count; ++i) {
-    int64_t flags = *struct_->fields[i].qualified_type->flags;
-    if (flags < 0) {
-      strcat_s(buffer, size, "const ");
-      flags = -flags;
+  switch (type->tag) {
+    case Type_Info_Tag_Struct: {
+      strcat_s(buffer, size, type->name);
+      const Type_Info_Struct *struct_ = &type->struct_;
+      strcat_s(buffer, size, " { ");
+      for (size_t i = 0; i < struct_->field_count; ++i) {
+        int64_t flags = *struct_->fields[i].qualified_type->flags;
+        if (flags < 0) {
+          strcat_s(buffer, size, "const ");
+          flags = -flags;
+        }
+        const Type_Info_Type *field_type = struct_->fields[i].qualified_type->type;
+        const bool recurse = false;
+        if (recurse) {
+          strcat_s(buffer, size, type_info_to_c_string(field_type));
+        } else {
+          strcat_s(buffer, size, field_type->name);
+        }
+        strcat_s(buffer, size, " ");
+        for (; flags; --flags) {
+          strcat_s(buffer, size, "*");
+        }
+        strcat_s(buffer, size, struct_->fields[i].name);
+        const Type_Info_Array_Size *array_size = struct_->fields[i].qualified_type->array_size_list;
+        while (array_size) {
+          strcat_s(buffer, size, "[");
+          sprintf_s(number_buffer, static_array_size(number_buffer), "%lld", array_size->size);
+          strcat_s(buffer, size, number_buffer);
+          strcat_s(buffer, size, "]");
+          array_size = array_size->next;
+        }
+        strcat_s(buffer, size, "; ");
+      }
+      strcat_s(buffer, size, "}");
+      break;
     }
-    strcat_s(buffer, size, struct_->fields[i].qualified_type->type->name);
-    strcat_s(buffer, size, " ");
-    for (; flags; --flags) {
-      strcat_s(buffer, size, "*");
+    default: {
+      strcat_s(buffer, size, type->name);
     }
-    strcat_s(buffer, size, struct_->fields[i].name);
-    const Type_Info_Array_Size *array_size = struct_->fields[i].qualified_type->array_size_list;
-    while (array_size) {
-      strcat_s(buffer, size, "[");
-      sprintf_s(number_buffer, static_array_size(number_buffer), "%lld", array_size->size);
-      strcat_s(buffer, size, number_buffer);
-      strcat_s(buffer, size, "]");
-      array_size = array_size->next;
-    }
-    strcat_s(buffer, size, "; ");
   }
-  strcat_s(buffer, size, "}");
   return buffer;
 }
 
@@ -346,14 +418,25 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 
 
 //////////////////////////////////////////////////////////////////////////////
-// Rect
+#define Self Geometry_Size
 //////////////////////////////////////////////////////////////////////////////
-
-#define Self Rect
 
 #define FIELDS(Self)\
   FIELD(TYPE(int), width)\
-  FIELD(TYPE(int), height)\
+  FIELD(TYPE(int), height)
+
+#define TRAITS\
+  TRAIT(Type_Info)
+
+#include "struct.h"
+#undef Self
+
+//////////////////////////////////////////////////////////////////////////////
+#define Self Rect
+//////////////////////////////////////////////////////////////////////////////
+
+#define FIELDS(Self)\
+  FIELD(TYPE(Geometry_Size), size)\
   FIELD(CONST(PTR(PTR(TYPE(int)))), dummy, 10, 21)
 
 #define TRAITS\
@@ -363,11 +446,11 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 #include "struct.h"
 
 inline int IMPL(Shape, area)(Self *self) {
-  return self->width * self->height;
+  return self->size.width * self->size.height;
 }
 
 inline int IMPL(Shape, perimeter)(Self *self) {
-  return self->width * 2 + self->height * 2;
+  return self->size.width * 2 + self->size.height * 2;
 }
 #undef Self
 
