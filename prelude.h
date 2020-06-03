@@ -189,6 +189,16 @@
 #define cast_to_trait(_trait_, _value_) \
   ((const _trait_) {instance(_trait_, _value_), _value_})
 
+//////////////////////////////////////////////////////////////////////////////
+// Default Instances
+//////////////////////////////////////////////////////////////////////////////
+
+// Users need to register here
+#define DEFAULT_TRAITS\
+  REGISTER_IMPLEMENTATION(Type_Info)\
+  REGISTER_IMPLEMENTATION(Rect)\
+  REGISTER_IMPLEMENTATION(Circle)\
+  REGISTER_IMPLEMENTATION(Geometry_Size)
 
 //////////////////////////////////////////////////////////////////////////////
 // Type_Info
@@ -279,13 +289,8 @@ const Type_Info_Type char__type_info = {
 #define type_info(self) invoke(Type_Info, type_info, self)
 #define print(self) print_from_type_info(self, type_info(self))
 
-
 // Users need to register here
-#define TRAIT_IMPLEMENTATIONS\
-  REGISTER_IMPLEMENTATION(Type_Info)\
-  REGISTER_IMPLEMENTATION(Rect)\
-  REGISTER_IMPLEMENTATION(Circle)\
-  REGISTER_IMPLEMENTATION(Geometry_Size)
+#define TRAIT_IMPLEMENTATIONS DEFAULT_TRAITS
 
 #define Self Type_Info
 #include "trait.h"
