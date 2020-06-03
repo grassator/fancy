@@ -1,5 +1,9 @@
 
-typedef struct Self {
+// Anonymous unions and structs in declaration is only compatible with C11,
+// but it is also a known GNU extension and is supported in a bunch of
+// compilers that otherwise do not support C11.
+typedef union Self {
+  struct {
 #undef CONST
 #define TYPE(_type_) _type_
 #define CONST(_type_) const _type_
@@ -10,11 +14,12 @@ FIELDS_HELPER(Self)
 #undef CONST
 #undef PTR
 #undef TYPE
+  };
   struct {
 #define TRAIT(_trait_) TRAIT_HELPER(_trait_, Self)
 TRAITS
 #undef TRAIT
-  } *prelude_traits[];
+  } **prelude_traits;
 } Self;
 
 #ifndef TRAIT_NAME

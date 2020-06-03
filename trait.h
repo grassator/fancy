@@ -17,7 +17,7 @@ enum {
 };
 #undef REGISTER_IMPLEMENTATION
 
-#define REGISTER_IMPLEMENTATION(_struct_name_) typedef struct _struct_name_ _struct_name_;
+#define REGISTER_IMPLEMENTATION(_struct_name_) typedef union _struct_name_ _struct_name_;
 TRAIT_IMPLEMENTATIONS
 #undef REGISTER_IMPLEMENTATION
 
