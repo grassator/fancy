@@ -1,6 +1,8 @@
+#ifndef MACRO_DEBUG
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#endif
 
 // Common things for all traits
 
@@ -21,15 +23,21 @@
             FIELD_ARG7, FIELD_ARG6, FIELD_ARG5, FIELD_ARG4, \
             FIELD_ARG3, FIELD_ARG2, FIELD_ARG1, FIELD_ARG0, ))
 
+#define FIELD_FLAGS(_struct_name_, _field_name_) \
+  CONCAT(CONCAT(_struct_name_, __field__), CONCAT(_field_name_, __flags))
+
 #define FIELD_INFO_ARG0(_type_, _name_)\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags) };
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
+    .array_size_list = 0 };
 
 #define FIELD_INFO_ARG1(_type_, _name_, N1)\
   static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
     = {N1, 0};\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags), \
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
 
 #define FIELD_INFO_ARG2(_type_, _name_, N1, N2)\
@@ -37,8 +45,9 @@
     = {N2, 0};\
   static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
     = {N1, &CONCAT(_name_, _type_info_array_2)};\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags), \
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
 
 #define FIELD_INFO_ARG3(_type_, _name_, N1, N2, N3)\
@@ -48,8 +57,9 @@
     = {N2, &CONCAT(_name_, _type_info_array_3)};\
   static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
     = {N1, &CONCAT(_name_, _type_info_array_2)};\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags), \
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
 
 #define FIELD_INFO_ARG4(_type_, _name_, N1, N2, N3, N4)\
@@ -61,8 +71,9 @@
     = {N2, &CONCAT(_name_, _type_info_array_3)};\
   static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
     = {N1, &CONCAT(_name_, _type_info_array_2)};\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags), \
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
 
 #define FIELD_INFO_ARG5(_type_, _name_, N1, N2, N3, N4, N5)\
@@ -76,8 +87,9 @@
     = {N2, &CONCAT(_name_, _type_info_array_3)};\
   static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
     = {N1, &CONCAT(_name_, _type_info_array_2)};\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags), \
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
 
 #define FIELD_INFO_ARG6(_type_, _name_, N1, N2, N3, N4, N5, N6)\
@@ -93,8 +105,9 @@
     = {N2, &CONCAT(_name_, _type_info_array_3)};\
   static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
     = {N1, &CONCAT(_name_, _type_info_array_2)};\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags), \
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
 
 #define FIELD_INFO_ARG7(_type_, _name_, N1, N2, N3, N4, N5, N6, N7)\
@@ -112,8 +125,9 @@
     = {N2, CONCAT(_name_, _type_info_array_3)};\
   static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1)\
     = {N1, &CONCAT(_name_, _type_info_array_2)};\
-  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
-    = { _type_, .flags = &CONCAT(_name_, _flags), \
+  static const Type_Info_Qualified_Type \
+    CONCAT(CONCAT(Self, __field__), CONCAT(_name_, __qualified_type))\
+    = { _type_, .flags = &FIELD_FLAGS(Self, _name_), \
     .array_size_list = &CONCAT(_name_, _type_info_array_1), };
 
 #define FIELD_INFO_MACRO_CHOOSER(...) \
@@ -246,7 +260,7 @@ typedef struct Type_Info_Qualified_Type {
   const Type_Info_Array_Size *array_size_list;
 } Type_Info_Qualified_Type;
 
-const Type_Info_Type int_type_info = {
+const Type_Info_Type int__type_info = {
   .tag = Type_Info_Type_Tag_Integer,
   .name = "int",
   .integer = {
