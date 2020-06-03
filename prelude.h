@@ -4,6 +4,74 @@
 
 // Common things for all traits
 
+#define MSVC_MACRO_EXPAND(...) __VA_ARGS__
+
+#define FIELD_ARG0(_type_, _name_) _type_ _name_;
+#define FIELD_ARG1(_type_, _name_, N1) _type_ _name_ [N1];
+#define FIELD_ARG2(_type_, _name_, N1, N2) _type_ _name_ [N1][N2];
+#define FIELD_ARG3(_type_, _name_, N1, N2, N3) _type_ _name_ [N1][N2][N3];
+#define FIELD_ARG4(_type_, _name_, N1, N2, N3, N4) _type_ _name_ [N1][N2][N3][N4];
+#define FIELD_ARG5(_type_, _name_, N1, N2, N3, N4, N5) _type_ _name_ [N1][N2][N3][N4][N5];
+#define FIELD_ARG6(_type_, _name_, N1, N2, N3, N4, N5, N6) _type_ _name_ [N1][N2][N3][N4][N5][N6];
+#define FIELD_ARG7(_type_, _name_, N1, N2, N3, N4, N5, N6, N7) _type_ _name_ [N1][N2][N3][N4][N5][N6][N7];
+
+#define GET_10TH_ARG(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, ...) arg10
+#define FIELD_MACRO_CHOOSER(...) \
+    MSVC_MACRO_EXPAND(GET_10TH_ARG(__VA_ARGS__, \
+            FIELD_ARG7, FIELD_ARG6, FIELD_ARG5, FIELD_ARG4, \
+            FIELD_ARG3, FIELD_ARG2, FIELD_ARG1, FIELD_ARG0, ))
+
+#define FIELD_INFO_ARG0(_type_, _name_)\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags) };
+#define FIELD_INFO_ARG1(_type_, _name_, N1)\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags), \
+    .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+#define FIELD_INFO_ARG2(_type_, _name_, N1, N2)\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags), \
+    .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+#define FIELD_INFO_ARG3(_type_, _name_, N1, N2, N3)\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags), \
+    .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+#define FIELD_INFO_ARG4(_type_, _name_, N1, N2, N3, N4)\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags), \
+    .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+#define FIELD_INFO_ARG5(_type_, _name_, N1, N2, N3, N4, N5)\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags), \
+    .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+#define FIELD_INFO_ARG6(_type_, _name_, N1, N2, N3, N4, N5, N6)\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags), \
+    .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+#define FIELD_INFO_ARG7(_type_, _name_, N1, N2, N3, N4, N5, N6, N7)\
+  static const Type_Info_Array_Size CONCAT(_name_, _type_info_array_1) = {N1};\
+  static const Type_Info_Qualified_Type CONCAT(_name_, _type_info)\
+    = { _type_, .flags = &CONCAT(_name_, _flags), \
+    .array_size_list = &CONCAT(_name_, _type_info_array_1), };
+
+#define FIELD_INFO_MACRO_CHOOSER(...) \
+    MSVC_MACRO_EXPAND(GET_10TH_ARG(__VA_ARGS__, \
+            FIELD_INFO_ARG7, FIELD_INFO_ARG6, FIELD_INFO_ARG5, FIELD_INFO_ARG4, \
+            FIELD_INFO_ARG3, FIELD_INFO_ARG2, FIELD_INFO_ARG1, FIELD_INFO_ARG0, ))
+
+
+
+#define FIELDS_HELPER(_type_) FIELDS(_type_)
+
+#define TRAIT_HELPER(_trait_, _type_) \
+  CONCAT(Trait__##_trait_##__, _type_) *Trait__##_trait_[DISPATCH_ENUM_ENTRY(Trait__##_trait_, _type_)];
+
 #define STRINGIFY_HELPER(S) #S
 #define STRINGIFY(S) STRINGIFY_HELPER(S)
 
@@ -111,16 +179,18 @@ typedef struct Type_Info_Type {
   };
 } Type_Info_Type;
 
+typedef struct Type_Info_Array_Size {
+  const int64_t size;
+  const struct Type_Info_Array_Size *next;
+} Type_Info_Array_Size;
+
 typedef struct Type_Info_Qualified_Type {
   const Type_Info_Type *type;
-  uint32_t pointer_indirection_1 : 1;
-  uint32_t pointer_indirection_2 : 1;
-  uint32_t pointer_indirection_3 : 1;
-  uint32_t pointer_indirection_4 : 1;
-  bool is_const;
+  const int64_t *flags;
+  const Type_Info_Array_Size *array_size_list;
 } Type_Info_Qualified_Type;
 
-const Type_Info_Type type_info_int = {
+const Type_Info_Type int_type_info = {
   .tag = Type_Info_Type_Tag_Integer,
   .name = "int",
   .integer = {
@@ -128,6 +198,7 @@ const Type_Info_Type type_info_int = {
     .size = sizeof(int),
   }
 };
+
 
 #define TRAIT_FUNCTIONS(Self)\
   TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self)
@@ -147,6 +218,8 @@ const Type_Info_Type type_info_int = {
 
 const char *type_info_to_c_string(const Type_Info_Type *type) {
   const size_t size = 4000;
+
+  char number_buffer[64] = {0};
   char *buffer = malloc(size);
 
   buffer[0] = 0;
@@ -154,18 +227,25 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
   const Type_Info_Struct *struct_ = &type->struct_;
   strcat_s(buffer, size, " { ");
   for (size_t i = 0; i < struct_->field_count; ++i) {
-    if (struct_->fields[i].qualified_type->is_const) {
+    int64_t flags = *struct_->fields[i].qualified_type->flags;
+    if (flags < 0) {
       strcat_s(buffer, size, "const ");
+      flags = -flags;
     }
     strcat_s(buffer, size, struct_->fields[i].qualified_type->type->name);
-    if (struct_->fields[i].qualified_type->pointer_indirection_1) {
-      strcat_s(buffer, size, "*");
-    }
-    if (struct_->fields[i].qualified_type->pointer_indirection_2) {
-      strcat_s(buffer, size, "*");
-    }
     strcat_s(buffer, size, " ");
+    for (; flags; --flags) {
+      strcat_s(buffer, size, "*");
+    }
     strcat_s(buffer, size, struct_->fields[i].name);
+    const Type_Info_Array_Size *array_size = struct_->fields[i].qualified_type->array_size_list;
+    while (array_size) {
+      strcat_s(buffer, size, "[");
+      sprintf_s(number_buffer, static_array_size(number_buffer), "%lld", array_size->size);
+      strcat_s(buffer, size, number_buffer);
+      strcat_s(buffer, size, "]");
+      array_size = array_size->next;
+    }
     strcat_s(buffer, size, "; ");
   }
   strcat_s(buffer, size, "}");
@@ -202,9 +282,9 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 #define Self Rect
 
 #define FIELDS(Self)\
-  FIELD(int, width)\
-  FIELD(int, height)\
-  //FIELD(CONST(PTR(PTR(int))), dummy)
+  FIELD(TYPE(int), width)\
+  FIELD(TYPE(int), height)\
+  FIELD(CONST(PTR(PTR(TYPE(int)))), dummy, 10)
 
 #define TRAITS\
   TRAIT(Shape)\
@@ -228,7 +308,7 @@ inline int IMPL(Shape, perimeter)(Self *self) {
 #define Self Circle
 
 #define FIELDS(Self)\
-  FIELD(int, radius)
+  FIELD(TYPE(int), radius)
 
 #define TRAITS\
   TRAIT(Shape)
@@ -243,4 +323,3 @@ inline int IMPL(Shape, perimeter)(Self *self) {
   return (int)(2.0 * 3.14 * self->radius);
 }
 #undef Self
-
