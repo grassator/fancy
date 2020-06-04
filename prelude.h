@@ -9,6 +9,55 @@
 
 #define MSVC_MACRO_EXPAND(...) __VA_ARGS__
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Trait Functions Macros
+/////////////////////////////////////////////////////////////////////////////////////////////////
+#define TRAIT_FN_ARG0(_return_, _name_, _type_)\
+  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
+  (_type_ *self) {\
+    return self->trait->##_name_##_ (self->value); \
+  }
+#define TRAIT_FN_ARG1(_return_, _name_, _type_, N1)\
+  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
+  (_type_ *self, N1 _1) {\
+    return self->trait->##_name_##_ (self->value, _1); \
+  }
+#define TRAIT_FN_ARG2(_return_, _name_, _type_, N1, N2)\
+  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
+  (_type_ *self, N1 _1, N2 _2) {\
+    return self->trait->##_name_##_ (self->value, _1, _2); \
+  }
+#define TRAIT_FN_ARG3(_return_, _name_, _type_, N1, N2, N3)\
+  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
+  (_type_ *self, N1 _1, N2 _2, N3 _3) {\
+    return self->trait->##_name_##_ (self->value, _1, _2, _3); \
+  }
+#define TRAIT_FN_ARG4(_return_, _name_, _type_, N1, N2, N3, N4)\
+  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
+  (_type_ *self, N1 _1, N2 _2, N3 _3, N4 _4) {\
+    return self->trait->##_name_##_ (self->value, _1, _2, _3, _4); \
+  }
+#define TRAIT_FN_ARG5(_return_, _name_, _type_, N1, N2, N3, N4, N5)\
+  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
+  (_type_ *self, N1 _1, N2 _2, N3 _3, N4 _4, N5 _5) {\
+    return self->trait->##_name_##_ (self->value, _1, _2, _3, _4, _5); \
+  }
+#define TRAIT_FN_ARG6(_return_, _name_, _type_, N1, N2, N3, N4, N5, N6)\
+  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
+  (_type_ *self, N1 _1, N2 _2, N3 _3, N4 _4, N5 _5, N6 _6) {\
+    return self->trait->##_name_##_ (self->value, _1, _2, _3, _4, _5, _6); \
+  }
+
+#define GET_10TH_ARG(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, ...) arg10
+#define TRAIT_FN_MACRO_CHOOSER(...) \
+  MSVC_MACRO_EXPAND(GET_10TH_ARG(__VA_ARGS__, \
+    TRAIT_FN_ARG6, TRAIT_FN_ARG5, TRAIT_FN_ARG4, TRAIT_FN_ARG3,\
+    TRAIT_FN_ARG2, TRAIT_FN_ARG1, TRAIT_FN_ARG0,,))
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Fields Macros
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define FIELD_ARG0(_type_, _name_) _type_ _name_;
 #define FIELD_ARG1(_type_, _name_, N1) _type_ _name_ [N1];
 #define FIELD_ARG2(_type_, _name_, N1, N2) _type_ _name_ [N1][N2];
@@ -136,9 +185,9 @@
             FIELD_INFO_ARG7, FIELD_INFO_ARG6, FIELD_INFO_ARG5, FIELD_INFO_ARG4, \
             FIELD_INFO_ARG3, FIELD_INFO_ARG2, FIELD_INFO_ARG1, FIELD_INFO_ARG0, ))
 
-
-
 #define FIELDS_HELPER(_type_) FIELDS(_type_)
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define TRAIT_HELPER(_trait_, _type_) \
   CONCAT(Trait__##_trait_##__, _type_) *Trait__##_trait_[DISPATCH_ENUM_ENTRY(Trait__##_trait_, _type_)];
@@ -398,6 +447,23 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
   }
   return buffer;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// Comparable
+//////////////////////////////////////////////////////////////////////////////
+
+#define TRAIT_FUNCTIONS(Self)\
+  TRAIT_FUNCTION(int, compare, Self, Self *)
+
+#define compare(self, other) invoke(Comparable, area, self, other)
+
+// Users need to register here
+#define TRAIT_IMPLEMENTATIONS\
+  REGISTER_IMPLEMENTATION(Comparable)
+
+#define Self Comparable
+#include "trait.h"
+#undef Self
 
 //////////////////////////////////////////////////////////////////////////////
 // Shape

@@ -68,10 +68,7 @@ TRAIT_IMPLEMENTATIONS
 
 #include "struct.h"
 
-#define TRAIT_FUNCTION(_return_, _name_, _type_, ...) \
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_) (_type_ *self, __VA_ARGS__) {\
-    return self->trait->##_name_##_ (self->value, __VA_ARGS__); \
-  }
+#define TRAIT_FUNCTION(...) MSVC_MACRO_EXPAND(TRAIT_FN_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
 TRAIT_FUNCTIONS(Self)
 #undef TRAIT_FUNCTION
 
