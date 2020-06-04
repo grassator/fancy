@@ -70,8 +70,8 @@ TRAIT_IMPLEMENTATIONS_HELPER
 
 #ifdef MAKE_SELF_IMPLEMENTATION
   #define FIELDS(Self)\
-    FIELD(const TRAIT_NAME *, trait)\
-    FIELD(void *, value)
+    FIELD(CONST(PTR(TYPE(TRAIT_NAME))), trait)\
+    FIELD(PTR(TYPE(void)), value)
 
   #define TRAITS\
     TRAIT(Self)

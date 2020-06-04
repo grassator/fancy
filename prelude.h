@@ -331,6 +331,11 @@ const Type_Info_Type char__type_info = {
   .integer = { .signedness = Type_Info_Integer_Signed, .size = sizeof(char), }
 };
 
+const Type_Info_Type void__type_info = {
+  .tag = Type_Info_Tag_Void,
+  .name = "void"
+};
+
 #define TRAIT_FUNCTIONS(Self)\
   TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self)
 
@@ -349,6 +354,9 @@ const Type_Info_Type char__type_info = {
 
 void print_from_type_info(void *self, const Type_Info_Type *type) {
   switch (type->tag) {
+    case Type_Info_Tag_Void: {
+      printf("void");
+    }
     case Type_Info_Tag_Integer: {
       int64_t to_print = 0;
       switch(type->integer.size) {
