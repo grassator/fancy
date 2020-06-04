@@ -244,7 +244,6 @@
 
 // Users need to register here
 #define DEFAULT_TRAITS\
-  IMPLEMENTATION(Type_Info)\
   IMPLEMENTATION(Rect)\
   IMPLEMENTATION(Circle)\
   IMPLEMENTATION(Geometry_Size)
@@ -339,7 +338,10 @@ const Type_Info_Type char__type_info = {
 #define print(self) print_from_type_info(self, type_info(self))
 
 // Users need to register here
-#define TRAIT_IMPLEMENTATIONS DEFAULT_TRAITS
+#define TRAIT_IMPLEMENTATIONS\
+  DEFAULT_TRAITS
+
+#define MAKE_SELF_IMPLEMENTATION
 
 #define Self Type_Info
 #include "trait.h"
@@ -458,8 +460,7 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 #define compare(self, other) invoke(Comparable, area, self, other)
 
 // Users need to register here
-#define TRAIT_IMPLEMENTATIONS\
-  IMPLEMENTATION(Comparable)
+#define TRAIT_IMPLEMENTATIONS
 
 #define Self Comparable
 #include "trait.h"
@@ -479,10 +480,10 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
-  IMPLEMENTATION(Shape)\
   IMPLEMENTATION(Rect)\
   IMPLEMENTATION(Circle)
 
+#define MAKE_SELF_IMPLEMENTATION
 #define Self Shape
 #include "trait.h"
 #undef Self
