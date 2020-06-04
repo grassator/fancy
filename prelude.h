@@ -244,10 +244,10 @@
 
 // Users need to register here
 #define DEFAULT_TRAITS\
-  REGISTER_IMPLEMENTATION(Type_Info)\
-  REGISTER_IMPLEMENTATION(Rect)\
-  REGISTER_IMPLEMENTATION(Circle)\
-  REGISTER_IMPLEMENTATION(Geometry_Size)
+  IMPLEMENTATION(Type_Info)\
+  IMPLEMENTATION(Rect)\
+  IMPLEMENTATION(Circle)\
+  IMPLEMENTATION(Geometry_Size)
 
 //////////////////////////////////////////////////////////////////////////////
 // Type_Info
@@ -459,7 +459,7 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
-  REGISTER_IMPLEMENTATION(Comparable)
+  IMPLEMENTATION(Comparable)
 
 #define Self Comparable
 #include "trait.h"
@@ -479,9 +479,9 @@ const char *type_info_to_c_string(const Type_Info_Type *type) {
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
-  REGISTER_IMPLEMENTATION(Shape)\
-  REGISTER_IMPLEMENTATION(Rect)\
-  REGISTER_IMPLEMENTATION(Circle)
+  IMPLEMENTATION(Shape)\
+  IMPLEMENTATION(Rect)\
+  IMPLEMENTATION(Circle)
 
 #define Self Shape
 #include "trait.h"
