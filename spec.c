@@ -2,11 +2,6 @@
 #include "prelude.h"
 #include <malloc.h>
 
-typedef struct {
-  void (*fn)(void *);
-  void *handle;
-} Closer;
-
 spec("prelude") {
   it("should compute area of the rectangle") {
     Rect rect = {42, 10};
@@ -43,12 +38,6 @@ spec("prelude") {
     Shape shape = cast_to_trait(Shape, &circle);
     check(area(&shape) == 314);
     check(perimeter(&shape) == 62);
-  }
-
-  it("should stringified Type_Info") {
-    Rect rect = {{42, 10}};
-    const char *type_info_string = type_info_to_c_string(type_info(&rect));
-    check(strcmp(type_info_string, "Rect { Geometry_Size size; const int **dummy[10][21]; }") == 0);
   }
 
   it("should be able to print a value") {

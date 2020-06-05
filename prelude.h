@@ -256,9 +256,6 @@ typedef enum {
   Type_Info_Tag_Void,
   Type_Info_Tag_Integer,
   Type_Info_Tag_Struct,
-  Type_Info_Tag_Pointer,
-  Type_Info_Tag_Array,
-  Type_Info_Tag_Enum,
 } Type_Info_Tag;
 
 typedef struct Type_Info_Qualified_Type Type_Info_Qualified_Type;
@@ -356,6 +353,7 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
   switch (type->tag) {
     case Type_Info_Tag_Void: {
       printf("void");
+      break;
     }
     case Type_Info_Tag_Integer: {
       int64_t to_print = 0;
@@ -406,56 +404,6 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
       break;
     }
   }
-}
-
-const char *type_info_to_c_string(const Type_Info_Type *type) {
-  const size_t size = 4000;
-
-  char number_buffer[64] = {0};
-  char *buffer = malloc(size);
-
-  buffer[0] = 0;
-  switch (type->tag) {
-    case Type_Info_Tag_Struct: {
-      strcat_s(buffer, size, type->name);
-      const Type_Info_Struct *struct_ = &type->struct_;
-      strcat_s(buffer, size, " { ");
-      for (size_t i = 0; i < struct_->field_count; ++i) {
-        int64_t flags = *struct_->fields[i].qualified_type->flags;
-        if (flags < 0) {
-          strcat_s(buffer, size, "const ");
-          flags = -flags;
-        }
-        const Type_Info_Type *field_type = struct_->fields[i].qualified_type->type;
-        const bool recurse = false;
-        if (recurse) {
-          strcat_s(buffer, size, type_info_to_c_string(field_type));
-        } else {
-          strcat_s(buffer, size, field_type->name);
-        }
-        strcat_s(buffer, size, " ");
-        for (; flags; --flags) {
-          strcat_s(buffer, size, "*");
-        }
-        strcat_s(buffer, size, struct_->fields[i].name);
-        const Type_Info_Array_Size *array_size = struct_->fields[i].qualified_type->array_size_list;
-        while (array_size) {
-          strcat_s(buffer, size, "[");
-          sprintf_s(number_buffer, static_array_size(number_buffer), "%lld", array_size->size);
-          strcat_s(buffer, size, number_buffer);
-          strcat_s(buffer, size, "]");
-          array_size = array_size->next;
-        }
-        strcat_s(buffer, size, "; ");
-      }
-      strcat_s(buffer, size, "}");
-      break;
-    }
-    default: {
-      strcat_s(buffer, size, type->name);
-    }
-  }
-  return buffer;
 }
 
 //////////////////////////////////////////////////////////////////////////////
