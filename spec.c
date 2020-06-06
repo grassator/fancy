@@ -1,8 +1,8 @@
 #include "bdd-for-c.h"
-#include "prelude.h"
+#include "fancy.h"
 #include <malloc.h>
 
-spec("prelude") {
+spec("fancy") {
   it("should compute area of the rectangle") {
     Rect rect = {42, 10};
     check(area(&rect) == 420);

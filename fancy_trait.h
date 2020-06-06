@@ -76,7 +76,7 @@ TRAIT_IMPLEMENTATIONS_HELPER
   #define TRAITS\
     TRAIT(Self)
 
-  #include "struct.h"
+  #include "fancy_struct.h"
 
   #define TRAIT_FUNCTION(...) MSVC_MACRO_EXPAND(TRAIT_FN_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
   TRAIT_FUNCTIONS(Self)

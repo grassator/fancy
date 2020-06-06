@@ -346,7 +346,7 @@ const Type_Info_Type void__type_info = {
 #define MAKE_SELF_IMPLEMENTATION
 
 #define Self Type_Info
-#include "trait.h"
+#include "fancy_trait.h"
 #undef Self
 
 void print_from_type_info(void *self, const Type_Info_Type *type) {
@@ -419,7 +419,7 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
 #define TRAIT_IMPLEMENTATIONS
 
 #define Self Comparable
-#include "trait.h"
+#include "fancy_trait.h"
 #undef Self
 
 //////////////////////////////////////////////////////////////////////////////
@@ -441,7 +441,7 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
 
 #define MAKE_SELF_IMPLEMENTATION
 #define Self Shape
-#include "trait.h"
+#include "fancy_trait.h"
 #undef Self
 
 
@@ -456,7 +456,7 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
 #define TRAITS\
   TRAIT(Type_Info)
 
-#include "struct.h"
+#include "fancy_struct.h"
 #undef Self
 
 //////////////////////////////////////////////////////////////////////////////
@@ -471,7 +471,7 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
   TRAIT(Shape)\
   TRAIT(Type_Info)
 
-#include "struct.h"
+#include "fancy_struct.h"
 
 inline int IMPL(Shape, area)(Self *self) {
   return self->size.width * self->size.height;
@@ -495,7 +495,7 @@ inline int IMPL(Shape, perimeter)(Self *self) {
   TRAIT(Shape)\
   TRAIT(Type_Info)
 
-#include "struct.h"
+#include "fancy_struct.h"
 
 inline int IMPL(Shape, area) (Self *self) {
   return (int)(3.14 * self->radius * self->radius);
