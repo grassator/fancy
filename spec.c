@@ -1,6 +1,6 @@
 #include "bdd-for-c.h"
 #include "fancy.h"
-#include <malloc.h>
+#include "examples/shape.h"
 
 spec("fancy") {
   it("should compute area of the rectangle") {

@@ -1,3 +1,6 @@
+#ifndef FANCY_H
+#define FANCY_H
+
 #ifndef MACRO_DEBUG
 #include <assert.h>
 #include <stdint.h>
@@ -422,86 +425,4 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
 #include "fancy_trait.h"
 #undef Self
 
-//////////////////////////////////////////////////////////////////////////////
-// Shape
-//////////////////////////////////////////////////////////////////////////////
-
-
-#define TRAIT_FUNCTIONS(Self)\
-  TRAIT_FUNCTION(int, area,      Self)\
-  TRAIT_FUNCTION(int, perimeter, Self)
-
-#define area(self)      invoke(Shape, area,      self)
-#define perimeter(self) invoke(Shape, perimeter, self)
-
-// Users need to register here
-#define TRAIT_IMPLEMENTATIONS\
-  IMPLEMENTATION(Rect)\
-  IMPLEMENTATION(Circle)
-
-#define MAKE_SELF_IMPLEMENTATION
-#define Self Shape
-#include "fancy_trait.h"
-#undef Self
-
-
-//////////////////////////////////////////////////////////////////////////////
-#define Self Geometry_Size
-//////////////////////////////////////////////////////////////////////////////
-
-#define FIELDS(Self)\
-  FIELD(TYPE(int), width)\
-  FIELD(TYPE(int), height)
-
-#define TRAITS\
-  TRAIT(Type_Info)
-
-#include "fancy_struct.h"
-#undef Self
-
-//////////////////////////////////////////////////////////////////////////////
-#define Self Rect
-//////////////////////////////////////////////////////////////////////////////
-
-#define FIELDS(Self)\
-  FIELD(TYPE(Geometry_Size), size)\
-  FIELD(CONST(PTR(PTR(TYPE(int)))), dummy, 10, 21)
-
-#define TRAITS\
-  TRAIT(Shape)\
-  TRAIT(Type_Info)
-
-#include "fancy_struct.h"
-
-inline int IMPL(Shape, area)(Self *self) {
-  return self->size.width * self->size.height;
-}
-
-inline int IMPL(Shape, perimeter)(Self *self) {
-  return self->size.width * 2 + self->size.height * 2;
-}
-#undef Self
-
-//////////////////////////////////////////////////////////////////////////////
-// Circle
-//////////////////////////////////////////////////////////////////////////////
-
-#define Self Circle
-
-#define FIELDS(Self)\
-  FIELD(TYPE(int), radius)
-
-#define TRAITS\
-  TRAIT(Shape)\
-  TRAIT(Type_Info)
-
-#include "fancy_struct.h"
-
-inline int IMPL(Shape, area) (Self *self) {
-  return (int)(3.14 * self->radius * self->radius);
-}
-
-inline int IMPL(Shape, perimeter)(Self *self) {
-  return (int)(2.0 * 3.14 * self->radius);
-}
-#undef Self
+#endif
