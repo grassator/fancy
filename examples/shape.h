@@ -1,3 +1,6 @@
+#ifndef SHAPE_H
+#define SHAPE_H
+
 #include "fancy.h"
 #include <math.h>
 
@@ -10,8 +13,8 @@
   TRAIT_FUNCTION(int, area,      Self)\
   TRAIT_FUNCTION(int, perimeter, Self)
 
-#define area(self)      invoke(Shape, area,      self)
-#define perimeter(self) invoke(Shape, perimeter, self)
+#define area(self)      fancy_invoke(Shape, area,      self)
+#define perimeter(self) fancy_invoke(Shape, perimeter, self)
 
 // Users need to register here
 #define TRAIT_IMPLEMENTATIONS\
@@ -85,3 +88,5 @@ inline int IMPL(Shape, perimeter)(Self *self) {
   return (int)(2.0 * CIRCLE_PI * self->radius);
 }
 #undef Self
+
+#endif

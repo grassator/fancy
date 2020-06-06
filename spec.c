@@ -17,8 +17,8 @@ spec("fancy") {
 
   it("should support generic invoke_ calls") {
     Circle circle = {10};
-    check(invoke(Shape, area, &circle) == 314);
-    check(invoke(Shape, perimeter, &circle) == 62);
+    check(fancy_invoke(Shape, area, &circle) == 314);
+    check(fancy_invoke(Shape, perimeter, &circle) == 62);
   }
 
   it("should support calls through explicit (unsafe) instance") {

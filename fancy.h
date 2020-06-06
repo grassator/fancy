@@ -235,21 +235,17 @@
 #define type_instance(_trait_, _type_) \
   TYPE_INSTANCE_HELPER(_trait_, _type_)
 
-#define invoke(_trait_, _fn_, _value_, ...) \
+#define fancy_invoke(_trait_, _fn_, _value_, ...) \
   CALL_TRAIT_FUNCTION_HELPER(_trait_, CONCAT(_fn_, _), _value_, ##__VA_ARGS__)
 
 #define cast_to_trait(_trait_, _value_) \
   ((const _trait_) {instance(_trait_, _value_), _value_})
 
 //////////////////////////////////////////////////////////////////////////////
-// Default Instances
+// Default Traits
 //////////////////////////////////////////////////////////////////////////////
 
-// Users need to register here
-#define DEFAULT_TRAITS\
-  IMPLEMENTATION(Rect)\
-  IMPLEMENTATION(Circle)\
-  IMPLEMENTATION(Geometry_Size)
+#include "fancy_default_traits.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Type_Info
@@ -258,6 +254,7 @@
 typedef enum {
   Type_Info_Tag_Void,
   Type_Info_Tag_Integer,
+  Type_Info_Tag_Float,
   Type_Info_Tag_Struct,
 } Type_Info_Tag;
 
@@ -290,6 +287,11 @@ typedef struct {
 
 typedef struct {
   const char *name;
+  uint32_t size;
+} Type_Info_Float;
+
+typedef struct {
+  const char *name;
   int64_t value;
 } Type_Info_Enum_Item;
 
@@ -304,6 +306,7 @@ typedef struct Type_Info_Type {
   const char *name;
   union {
     const Type_Info_Integer integer;
+    const Type_Info_Float float_;
     const Type_Info_Struct struct_;
   };
 } Type_Info_Type;
@@ -318,6 +321,18 @@ typedef struct Type_Info_Qualified_Type {
   const int64_t *flags;
   const Type_Info_Array_Size *array_size_list;
 } Type_Info_Qualified_Type;
+
+const Type_Info_Type float__type_info = {
+  .tag = Type_Info_Tag_Float,
+  .name = "float",
+  .float_ = { .size = sizeof(float), }
+};
+
+const Type_Info_Type double__type_info = {
+  .tag = Type_Info_Tag_Float,
+  .name = "double",
+  .float_ = { .size = sizeof(double), }
+};
 
 const Type_Info_Type int__type_info = {
   .tag = Type_Info_Tag_Integer,
@@ -339,7 +354,7 @@ const Type_Info_Type void__type_info = {
 #define TRAIT_FUNCTIONS(Self)\
   TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self)
 
-#define type_info(self) invoke(Type_Info, type_info, self)
+#define type_info(self) fancy_invoke(Type_Info, type_info, self)
 #define print(self) print_from_type_info(self, type_info(self))
 
 // Users need to register here
@@ -356,6 +371,11 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
   switch (type->tag) {
     case Type_Info_Tag_Void: {
       printf("void");
+      break;
+    }
+    case Type_Info_Tag_Float: {
+      double to_print = *((double *)self);
+      printf("%f", to_print);
       break;
     }
     case Type_Info_Tag_Integer: {
@@ -416,10 +436,11 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
 #define TRAIT_FUNCTIONS(Self)\
   TRAIT_FUNCTION(int, compare, Self, Self *)
 
-#define compare(self, other) invoke(Comparable, area, self, other)
+#define compare(self, other) fancy_invoke(Comparable, area, self, other)
 
 // Users need to register here
-#define TRAIT_IMPLEMENTATIONS
+#define TRAIT_IMPLEMENTATIONS\
+  // IMPLEMENTATION(My_Struct_Type)
 
 #define Self Comparable
 #include "fancy_trait.h"
