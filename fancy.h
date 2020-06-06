@@ -256,6 +256,7 @@ typedef enum {
   Type_Info_Tag_Integer,
   Type_Info_Tag_Float,
   Type_Info_Tag_Struct,
+  Type_Info_Tag_Enum,
 } Type_Info_Tag;
 
 typedef struct Type_Info_Qualified_Type Type_Info_Qualified_Type;
@@ -282,12 +283,12 @@ typedef enum {
 typedef struct {
   const char *name;
   Type_Info_Integer_Signedness signedness;
-  uint32_t size;
+  uint32_t byte_size;
 } Type_Info_Integer;
 
 typedef struct {
   const char *name;
-  uint32_t size;
+  uint32_t byte_size;
 } Type_Info_Float;
 
 typedef struct {
@@ -296,9 +297,9 @@ typedef struct {
 } Type_Info_Enum_Item;
 
 typedef struct {
-  Type_Info_Integer *integer_type;
-  Type_Info_Enum_Item *items;
+  const Type_Info_Enum_Item *items;
   uint32_t item_count;
+  uint32_t byte_size;
 } Type_Info_Enum;
 
 typedef struct Type_Info_Type {
@@ -308,6 +309,7 @@ typedef struct Type_Info_Type {
     const Type_Info_Integer integer;
     const Type_Info_Float float_;
     const Type_Info_Struct struct_;
+    const Type_Info_Enum enum_;
   };
 } Type_Info_Type;
 
@@ -325,25 +327,25 @@ typedef struct Type_Info_Qualified_Type {
 const Type_Info_Type float__type_info = {
   .tag = Type_Info_Tag_Float,
   .name = "float",
-  .float_ = { .size = sizeof(float), }
+  .float_ = { .byte_size = sizeof(float), }
 };
 
 const Type_Info_Type double__type_info = {
   .tag = Type_Info_Tag_Float,
   .name = "double",
-  .float_ = { .size = sizeof(double), }
+  .float_ = { .byte_size = sizeof(double), }
 };
 
 const Type_Info_Type int__type_info = {
   .tag = Type_Info_Tag_Integer,
   .name = "int",
-  .integer = { .signedness = Type_Info_Integer_Signed, .size = sizeof(int), }
+  .integer = { .signedness = Type_Info_Integer_Signed, .byte_size = sizeof(int), }
 };
 
 const Type_Info_Type char__type_info = {
   .tag = Type_Info_Tag_Integer,
   .name = "char",
-  .integer = { .signedness = Type_Info_Integer_Signed, .size = sizeof(char), }
+  .integer = { .signedness = Type_Info_Integer_Signed, .byte_size = sizeof(char), }
 };
 
 const Type_Info_Type void__type_info = {
@@ -380,9 +382,36 @@ void print_from_type_info(void *self, const Type_Info_Type *type, uint16_t max_d
       printf("%f", to_print);
       break;
     }
+    case Type_Info_Tag_Enum: {
+      int64_t to_print = 0;
+      switch(type->enum_.byte_size) {
+        case 8: {
+          to_print = *((int64_t *)self);
+          break;
+        }
+        case 4: {
+          to_print = *((int32_t *)self);
+          break;
+        }
+        case 2: {
+          to_print = *((int16_t *)self);
+          break;
+        }
+        case 1: {
+          to_print = *((int8_t *)self);
+          break;
+        }
+        default: {
+          assert(!"Unknown integer size");
+        }
+      }
+      assert(to_print < type->enum_.item_count);
+      printf("%s", type->enum_.items[to_print].name);
+      break;
+    }
     case Type_Info_Tag_Integer: {
       int64_t to_print = 0;
-      switch(type->integer.size) {
+      switch(type->integer.byte_size) {
         case 8: {
           to_print = *((int64_t *)self);
           break;
@@ -421,6 +450,7 @@ void print_from_type_info(void *self, const Type_Info_Type *type, uint16_t max_d
           const Type_Info_Struct_Field *field = &struct_->fields[i];
           const Type_Info_Type *field_type = field->qualified_type->type;
           void *field_value = (uint8_t *)self + field->offset;
+          printf(".%s = ", field->name);
           print_from_type_info(field_value, field_type, max_depth - 1);
         }
       }

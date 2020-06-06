@@ -1,6 +1,7 @@
 #include "bdd-for-c.h"
 #include "fancy.h"
 #include "examples/shape.h"
+#include "examples/enum.h"
 
 spec("fancy") {
   it("should compute area of the rectangle") {
@@ -46,6 +47,12 @@ spec("fancy") {
     printf("\n");
     Circle circle = {10};
     print(&circle);
+    printf("\n");
+  }
+
+  it("should be able to print struct with an enum field") {
+    Using_Enum_Field test = {.enum_field = Example_Enum_One};
+    print(&test);
     printf("\n");
   }
 }
