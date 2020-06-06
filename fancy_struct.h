@@ -6,6 +6,7 @@ typedef struct Self {
   union {
     struct {
   #undef CONST
+  #define UNSIGNED(_type_) unsigned _type_
   #define TYPE(_type_) _type_
   #define CONST(_type_) const _type_
   #define PTR(_type_)_type_*
@@ -15,6 +16,7 @@ typedef struct Self {
   #undef CONST
   #undef PTR
   #undef TYPE
+  #undef UNSIGNED
     };
     struct {
   #define TRAIT(_trait_) TRAIT_HELPER(_trait_, Self)
@@ -26,6 +28,7 @@ typedef struct Self {
 
 #ifndef TRAIT_NAME
 
+#define UNSIGNED(_type_) _type_
 #define TYPE(_type_) 0
 #define CONST(_type_) (_type_) * (-1)
 #define PTR(_type_) _type_ + 1
@@ -36,8 +39,10 @@ FIELDS_HELPER(Self)
 #undef CONST
 #undef PTR
 #undef TYPE
+#undef UNSIGNED
 
 // Define field flags constants
+#define UNSIGNED(_type_) CONCAT(unsigned_, _type_)
 #define TYPE(_type_) &CONCAT(_type_, __type_info)
 #define CONST(_type_) _type_
 #define PTR(_type_) _type_
@@ -47,10 +52,12 @@ FIELDS_HELPER(Self)
 #undef CONST
 #undef PTR
 #undef TYPE
+#undef UNSIGNED
 
 // TODO the ##__VA_ARGS__ here is not C99 compatible,
 //      need to create a separate FIELD_ * macro set to fix!
 static const Type_Info_Struct_Field CONCAT(Self, __fields)[] = {
+  #define UNSIGNED(_type_) unsigned _type_
   #define CONST(_type_) const _type_
   #define TYPE(_type_) _type_
   #define PTR(_type_) _type_*
@@ -66,6 +73,7 @@ static const Type_Info_Struct_Field CONCAT(Self, __fields)[] = {
   #undef CONST
   #undef PTR
   #undef TYPE
+  #undef UNSIGNED
 };
 
 static const Type_Info_Type CONCAT(Self, __type_info) = {

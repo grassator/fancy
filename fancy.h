@@ -342,10 +342,34 @@ const Type_Info_Type int__type_info = {
   .integer = { .signedness = Type_Info_Integer_Signed, .byte_size = sizeof(int), }
 };
 
+const Type_Info_Type unsigned_int__type_info = {
+  .tag = Type_Info_Tag_Integer,
+  .name = "unsigned int",
+  .integer = { .signedness = Type_Info_Integer_Unsigned, .byte_size = sizeof(unsigned int), }
+};
+
+const Type_Info_Type long__type_info = {
+  .tag = Type_Info_Tag_Integer,
+  .name = "long",
+  .integer = { .signedness = Type_Info_Integer_Signed, .byte_size = sizeof(long), }
+};
+
+const Type_Info_Type unsigned_long__type_info = {
+  .tag = Type_Info_Tag_Integer,
+  .name = "unsigned long",
+  .integer = { .signedness = Type_Info_Integer_Unsigned, .byte_size = sizeof(unsigned long), }
+};
+
 const Type_Info_Type char__type_info = {
   .tag = Type_Info_Tag_Integer,
   .name = "char",
   .integer = { .signedness = Type_Info_Integer_Signed, .byte_size = sizeof(char), }
+};
+
+const Type_Info_Type unsigned_char__type_info = {
+  .tag = Type_Info_Tag_Integer,
+  .name = "unsigned char",
+  .integer = { .signedness = Type_Info_Integer_Unsigned, .byte_size = sizeof(unsigned char), }
 };
 
 const Type_Info_Type void__type_info = {

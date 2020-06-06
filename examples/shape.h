@@ -75,7 +75,7 @@ inline int IMPL(Shape, perimeter)(Self *self) {
 #define Self Circle
 
 #define FIELDS(Self)\
-  FIELD(TYPE(int), radius)
+  FIELD(TYPE(UNSIGNED(int)), radius)
 
 #define TRAITS\
   TRAIT(Shape)\

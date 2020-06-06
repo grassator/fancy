@@ -2,6 +2,7 @@
 #include "fancy.h"
 #include "examples/shape.h"
 #include "examples/enum.h"
+#include "examples/struct_type_modifiers.h"
 
 spec("fancy") {
   it("should compute area of the rectangle") {
