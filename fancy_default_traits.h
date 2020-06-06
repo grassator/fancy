@@ -1,10 +1,12 @@
 #ifndef FANCY_DEFAULT_TRAITS_H
 #define FANCY_DEFAULT_TRAITS_H
 
-// All fancy structs need to be registered here
-#define DEFAULT_TRAITS\
+#define FANCY_TYPE_INFO_TRAIT_IMPLEMENTATIONS\
   IMPLEMENTATION(Rect)\
   IMPLEMENTATION(Circle)\
+  IMPLEMENTATION(Geometry_Size)
+
+#define FANCY_COMPARABLE_TRAIT_IMPLEMENTATIONS\
   IMPLEMENTATION(Geometry_Size)
 
 #endif

@@ -354,20 +354,22 @@ const Type_Info_Type void__type_info = {
 #define TRAIT_FUNCTIONS(Self)\
   TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self)
 
+#ifndef FANCY_PRINT_MAX_DEPTH
+#define FANCY_PRINT_MAX_DEPTH 3
+#endif
+
 #define type_info(self) fancy_invoke(Type_Info, type_info, self)
-#define print(self) print_from_type_info(self, type_info(self))
+#define print(self) print_from_type_info(self, type_info(self), FANCY_PRINT_MAX_DEPTH)
 
-// Users need to register here
-#define TRAIT_IMPLEMENTATIONS\
-  DEFAULT_TRAITS
-
+#define TRAIT_IMPLEMENTATIONS FANCY_TYPE_INFO_TRAIT_IMPLEMENTATIONS
 #define MAKE_SELF_IMPLEMENTATION
 
 #define Self Type_Info
 #include "fancy_trait.h"
 #undef Self
 
-void print_from_type_info(void *self, const Type_Info_Type *type) {
+void print_from_type_info(void *self, const Type_Info_Type *type, uint16_t max_depth) {
+  if (max_depth == 0) return;
   switch (type->tag) {
     case Type_Info_Tag_Void: {
       printf("void");
@@ -411,13 +413,16 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
     case Type_Info_Tag_Struct: {
       const Type_Info_Struct *struct_ = &type->struct_;
       printf("%s { ", type->name);
-      for (size_t i = 0; i < struct_->field_count; ++i) {
-        if (i != 0) printf(", ");
-        const Type_Info_Struct_Field *field = &struct_->fields[i];
-        const Type_Info_Type *field_type = field->qualified_type->type;
-        void *field_value = (uint8_t *)self + field->offset;
-        // FIXME should limit this recursion
-        print_from_type_info(field_value, field_type);
+      if (max_depth == 1) {
+        printf("...");
+      } else {
+        for (size_t i = 0; i < struct_->field_count; ++i) {
+          if (i != 0) printf(", ");
+          const Type_Info_Struct_Field *field = &struct_->fields[i];
+          const Type_Info_Type *field_type = field->qualified_type->type;
+          void *field_value = (uint8_t *)self + field->offset;
+          print_from_type_info(field_value, field_type, max_depth - 1);
+        }
       }
       printf(" }");
       break;
@@ -438,9 +443,7 @@ void print_from_type_info(void *self, const Type_Info_Type *type) {
 
 #define compare(self, other) fancy_invoke(Comparable, area, self, other)
 
-// Users need to register here
-#define TRAIT_IMPLEMENTATIONS\
-  // IMPLEMENTATION(My_Struct_Type)
+#define TRAIT_IMPLEMENTATIONS FANCY_COMPARABLE_TRAIT_IMPLEMENTATIONS
 
 #define Self Comparable
 #include "fancy_trait.h"

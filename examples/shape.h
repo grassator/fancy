@@ -8,7 +8,6 @@
 // Shape
 //////////////////////////////////////////////////////////////////////////////
 
-
 #define TRAIT_FUNCTIONS(Self)\
   TRAIT_FUNCTION(int, area,      Self)\
   TRAIT_FUNCTION(int, perimeter, Self)
@@ -39,6 +38,11 @@
   TRAIT(Type_Info)
 
 #include "fancy_struct.h"
+
+inline int IMPL(Comparable, compare)(Self *self, Self *other) {
+  return self->width * self->height - other->width * other->height;
+}
+
 #undef Self
 
 //////////////////////////////////////////////////////////////////////////////
@@ -61,6 +65,7 @@ inline int IMPL(Shape, area)(Self *self) {
 inline int IMPL(Shape, perimeter)(Self *self) {
   return self->size.width * 2 + self->size.height * 2;
 }
+
 #undef Self
 
 //////////////////////////////////////////////////////////////////////////////
