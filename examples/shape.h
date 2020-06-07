@@ -20,7 +20,6 @@
   IMPLEMENTATION(Rect)\
   IMPLEMENTATION(Circle)
 
-#define MAKE_SELF_IMPLEMENTATION
 #define Self Shape
 #include "fancy_trait.h"
 #undef Self
@@ -38,10 +37,6 @@
   TRAIT(Type_Info)
 
 #include "fancy_struct.h"
-
-inline int IMPL(Comparable, compare)(Self *self, Self *other) {
-  return self->width * self->height - other->width * other->height;
-}
 
 #undef Self
 

@@ -13,51 +13,6 @@
 #define MSVC_MACRO_EXPAND(...) __VA_ARGS__
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// Trait Functions Macros
-/////////////////////////////////////////////////////////////////////////////////////////////////
-#define TRAIT_FN_ARG0(_return_, _name_, _type_)\
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
-  (_type_ *self) {\
-    return self->trait->##_name_##_ (self->value); \
-  }
-#define TRAIT_FN_ARG1(_return_, _name_, _type_, N1)\
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
-  (_type_ *self, N1 _1) {\
-    return self->trait->##_name_##_ (self->value, _1); \
-  }
-#define TRAIT_FN_ARG2(_return_, _name_, _type_, N1, N2)\
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
-  (_type_ *self, N1 _1, N2 _2) {\
-    return self->trait->##_name_##_ (self->value, _1, _2); \
-  }
-#define TRAIT_FN_ARG3(_return_, _name_, _type_, N1, N2, N3)\
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
-  (_type_ *self, N1 _1, N2 _2, N3 _3) {\
-    return self->trait->##_name_##_ (self->value, _1, _2, _3); \
-  }
-#define TRAIT_FN_ARG4(_return_, _name_, _type_, N1, N2, N3, N4)\
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
-  (_type_ *self, N1 _1, N2 _2, N3 _3, N4 _4) {\
-    return self->trait->##_name_##_ (self->value, _1, _2, _3, _4); \
-  }
-#define TRAIT_FN_ARG5(_return_, _name_, _type_, N1, N2, N3, N4, N5)\
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
-  (_type_ *self, N1 _1, N2 _2, N3 _3, N4 _4, N5 _5) {\
-    return self->trait->##_name_##_ (self->value, _1, _2, _3, _4, _5); \
-  }
-#define TRAIT_FN_ARG6(_return_, _name_, _type_, N1, N2, N3, N4, N5, N6)\
-  _return_ CONCAT(TRAIT_NAME, __##_type_##__##_name_)\
-  (_type_ *self, N1 _1, N2 _2, N3 _3, N4 _4, N5 _5, N6 _6) {\
-    return self->trait->##_name_##_ (self->value, _1, _2, _3, _4, _5, _6); \
-  }
-
-#define GET_10TH_ARG(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, ...) arg10
-#define TRAIT_FN_MACRO_CHOOSER(...) \
-  MSVC_MACRO_EXPAND(GET_10TH_ARG(__VA_ARGS__, \
-    TRAIT_FN_ARG6, TRAIT_FN_ARG5, TRAIT_FN_ARG4, TRAIT_FN_ARG3,\
-    TRAIT_FN_ARG2, TRAIT_FN_ARG1, TRAIT_FN_ARG0,,))
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
 // Fields Macros
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -204,14 +159,14 @@
 #define CONCAT_HELPER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_HELPER(a, b)
 
-#define IMPL_HELPER(_trait_, _fn_, _type_) \
- CONCAT(CONCAT(Trait__##_trait_##__, _type_),  __##_fn_)
+#define IMPL_TYPE(_trait_, _fn_, _type_) \
+ CONCAT(CONCAT(Trait__##_trait_##__, _type_),  CONCAT(__, _fn_))
 
 #define IMPL(_trait_, _fn_) \
- IMPL_HELPER(_trait_, _fn_, Self)
+ IMPL_TYPE(_trait_, _fn_, Self)
 
 #define GET_FAKE_TRAITS_ARRAY(_value_,_trait_) \
-  (_value_)->prelude_traits[0]->_trait_
+  ((_value_)->fancy_traits->_trait_)
 
 #define GET_INSTANCE(_trait_, _value_) \
   (Trait__##_trait_##_Implementation_Lookup_Table[ \
@@ -251,41 +206,166 @@
 #include "fancy_default_traits.h"
 
 //////////////////////////////////////////////////////////////////////////////
+// Comparable
+//////////////////////////////////////////////////////////////////////////////
+
+#define TRAIT_FUNCTIONS(Self)\
+  TRAIT_FUNCTION(int, compare, Self, const Self *, const Self *)
+
+#define compare(self, other) fancy_invoke(Comparable, area, self, other)
+
+typedef long long long_long;
+typedef unsigned char unsigned_char;
+typedef unsigned int unsigned_int;
+typedef unsigned long unsigned_long;
+typedef unsigned long long unsigned_long_long;
+
+#define TRAIT_IMPLEMENTATIONS\
+  IMPLEMENTATION(C(float))\
+  IMPLEMENTATION(C(double))\
+  IMPLEMENTATION(C(char))\
+  IMPLEMENTATION(C(int))\
+  IMPLEMENTATION(C(long))\
+  IMPLEMENTATION(C(long_long))\
+  IMPLEMENTATION(C(unsigned_char))\
+  IMPLEMENTATION(C(unsigned_int))\
+  IMPLEMENTATION(C(unsigned_long))\
+  IMPLEMENTATION(C(unsigned_long_long))\
+  FANCY_COMPARABLE_TRAIT_IMPLEMENTATIONS
+
+inline int IMPL_TYPE(Comparable, compare, float)(
+  const float *a,
+  const float *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+inline int IMPL_TYPE(Comparable, compare, double)(
+  const double *a,
+  const double *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+inline int IMPL_TYPE(Comparable, compare, char)(
+  const char *a,
+  const char *b
+) {
+  return *a - *b;
+}
+
+inline int IMPL_TYPE(Comparable, compare, int)(
+  const int *a,
+  const int *b
+) {
+  return *a - *b;
+}
+
+inline int IMPL_TYPE(Comparable, compare, long)(
+  const long *a,
+  const long *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+inline int IMPL_TYPE(Comparable, compare, long_long)(
+  const long long *a,
+  const long long *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+inline int IMPL_TYPE(Comparable, compare, unsigned_char)(
+  const unsigned char *a,
+  const unsigned char *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+inline int IMPL_TYPE(Comparable, compare, unsigned_int)(
+  const unsigned int *a,
+  const unsigned int *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+inline int IMPL_TYPE(Comparable, compare, unsigned_long)(
+  const unsigned long *a,
+  const unsigned long *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+inline int IMPL_TYPE(Comparable, compare, unsigned_long_long)(
+  const unsigned long long *a,
+  const unsigned long long *b
+) {
+  return (*a > *b) - (*a < *b);
+}
+
+#define Self Comparable
+#include "fancy_trait.h"
+#undef Self
+
+//////////////////////////////////////////////////////////////////////////////
+// Primitive types
+//////////////////////////////////////////////////////////////////////////////
+
+#define fancy_primitive_type_vtable_typedef(_type_)\
+  typedef struct {\
+    const CONCAT(Trait__Comparable__, _type_) *Trait__Comparable;\
+  } CONCAT(VTable__, _type_);\
+  const CONCAT(VTable__, _type_) CONCAT(VTable__Implementation__, _type_) = {\
+    .Trait__Comparable = &CONCAT(CONCAT(Trait__Comparable, __Implementation__), _type_),\
+  };
+
+fancy_primitive_type_vtable_typedef(float);
+fancy_primitive_type_vtable_typedef(double);
+fancy_primitive_type_vtable_typedef(char);
+fancy_primitive_type_vtable_typedef(int);
+fancy_primitive_type_vtable_typedef(long);
+fancy_primitive_type_vtable_typedef(long_long);
+fancy_primitive_type_vtable_typedef(unsigned_char);
+fancy_primitive_type_vtable_typedef(unsigned_int);
+fancy_primitive_type_vtable_typedef(unsigned_long);
+fancy_primitive_type_vtable_typedef(unsigned_long_long);
+
+//////////////////////////////////////////////////////////////////////////////
 // Array
 //////////////////////////////////////////////////////////////////////////////
 
 typedef struct {
+  const void *vtable;
   char *next_free;
   char *after_last;
   char items[];
 } Fancy_Array_Internal;
 
-#define fancy_array_typedef_internal(_type_, _suffix_)\
+#define fancy_array_typedef(_type_)\
   typedef union {\
     Fancy_Array_Internal *internal;\
-    struct CONCAT(Fancy_Array_Internal__, _suffix_) {\
+    struct CONCAT(Fancy_Array_Internal__, _type_) {\
+      const CONCAT(VTable__, _type_) *vtable;\
       _type_ *next_free;\
       _type_ *after_last;\
       _type_ items[];\
     } *array;\
-  } CONCAT(Fancy_Array__, _suffix_)
+  } CONCAT(Fancy_Array__, _type_)
 
-#define fancy_array_typedef(_type_)\
-  fancy_array_typedef_internal(_type_, _type_)
-
-fancy_array_typedef_internal(float, float);
-fancy_array_typedef_internal(double, double);
-fancy_array_typedef_internal(char, char);
-fancy_array_typedef_internal(int, int);
-fancy_array_typedef_internal(long, long);
-fancy_array_typedef_internal(long long, long_long);
-fancy_array_typedef_internal(unsigned char, unsigned_char);
-fancy_array_typedef_internal(unsigned int, unsigned_int);
-fancy_array_typedef_internal(unsigned long, unsigned_long);
-fancy_array_typedef_internal(unsigned long long, unsigned_long_long);
+fancy_array_typedef(float);
+fancy_array_typedef(double);
+fancy_array_typedef(char);
+fancy_array_typedef(int);
+fancy_array_typedef(long);
+fancy_array_typedef(long_long);
+fancy_array_typedef(unsigned_char);
+fancy_array_typedef(unsigned_int);
+fancy_array_typedef(unsigned_long);
+fancy_array_typedef(unsigned_long_long);
 
 Fancy_Array_Internal *
 fancy_array_realloc_internal(
+  const void *vtable,
   Fancy_Array_Internal *internal,
   size_t item_size,
   size_t item_count
@@ -293,6 +373,7 @@ fancy_array_realloc_internal(
   size_t new_allocation_size = sizeof(Fancy_Array_Internal) + item_count * item_size;
   Fancy_Array_Internal *result = realloc(internal, new_allocation_size);
   if (result) {
+    result->vtable = vtable;
     result->next_free = result->items;
     result->after_last = result->items + item_count * item_size;
   } else {
@@ -309,7 +390,7 @@ fancy_array_increase_capacity(
   size_t current_capacity = ((*internal)->after_last - (*internal)->items) / item_size;
   size_t new_capacity = current_capacity + current_capacity / 2;
   size_t next_free_offset = (*internal)->next_free - (*internal)->items;
-  *internal = fancy_array_realloc_internal(*internal, item_size, new_capacity);
+  *internal = fancy_array_realloc_internal((*internal)->vtable, *internal, item_size, new_capacity);
   if (*internal) {
     (*internal)->next_free += next_free_offset;
   }
@@ -329,7 +410,9 @@ fancy_array_ensure_capacity(
 #define fancy_array(_type_) CONCAT(Fancy_Array__, _type_)
 #define fancy_array_alloc(_type_, _count_)\
   ((CONCAT(Fancy_Array__, _type_)) {\
-    .internal = fancy_array_realloc_internal(0, sizeof(_type_), _count_), \
+    .internal = fancy_array_realloc_internal(\
+      &CONCAT(VTable__Implementation__, _type_), 0, sizeof(_type_), _count_\
+    ),\
   })
 #define fancy_array_push(_array_, _value_)\
   do {\
@@ -341,7 +424,16 @@ fancy_array_ensure_capacity(
   (((_array_).internal->after_last - (_array_).internal->items) / sizeof((_array_).array->items[0]))
 
 #define fancy_array_count(_array_)\
-  (((_array_).internal->next_free - (_array_).internal->items) / sizeof((_array_).array->items[0]))
+  (((_array_).array->next_free - (_array_).array->items))
+
+
+#define fancy_array_sort(_array_)\
+  qsort(\
+    (_array_).array->items,\
+    fancy_array_count(test),\
+    sizeof((_array_).array->items[0]),\
+    (_array_).array->vtable->Trait__Comparable->compare_\
+  );
 
 #define fancy_array_get(_array_, _index_)\
   (&(_array_).array->items[_index_])
@@ -479,7 +571,7 @@ const Type_Info_Type void__type_info = {
 };
 
 #define TRAIT_FUNCTIONS(Self)\
-  TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self)
+  TRAIT_FUNCTION(const Type_Info_Type *, type_info, Self, Self *)
 
 #ifndef FANCY_PRINT_MAX_DEPTH
 #define FANCY_PRINT_MAX_DEPTH 3
@@ -588,20 +680,5 @@ void print_from_type_info(void *self, const Type_Info_Type *type, uint16_t max_d
     }
   }
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// Comparable
-//////////////////////////////////////////////////////////////////////////////
-
-#define TRAIT_FUNCTIONS(Self)\
-  TRAIT_FUNCTION(int, compare, Self, Self *)
-
-#define compare(self, other) fancy_invoke(Comparable, area, self, other)
-
-#define TRAIT_IMPLEMENTATIONS FANCY_COMPARABLE_TRAIT_IMPLEMENTATIONS
-
-#define Self Comparable
-#include "fancy_trait.h"
-#undef Self
 
 #endif

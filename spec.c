@@ -16,6 +16,18 @@ spec("fancy") {
     check(test.at(4) == 4);
     check(fancy_array_count(test) == 5);
   }
+
+  it("should be possible to sort arrays of int") {
+    fancy_array(int) test = fancy_array_alloc(int, 10);
+    fancy_array_push(test, 9);
+    fancy_array_push(test, 2);
+    fancy_array_push(test, 6);
+    fancy_array_sort(test);
+    check(test.at(0) == 2);
+    check(test.at(1) == 6);
+    check(test.at(2) == 9);
+  }
+
   it("should compute area of the rectangle") {
     Rect rect = {42, 10};
     check(area(&rect) == 420);
@@ -44,13 +56,6 @@ spec("fancy") {
     Circle circle = {10};
     check(type_instance(Shape, Circle)->area_(&circle) == 314);
     check(type_instance(Shape, Circle)->perimeter_(&circle) == 62);
-  }
-
-  it("should support virtual calls through the trait type") {
-    Circle circle = {10};
-    Shape shape = cast_to_trait(Shape, &circle);
-    check(area(&shape) == 314);
-    check(perimeter(&shape) == 62);
   }
 
   it("should be able to print a value") {
