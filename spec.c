@@ -5,6 +5,17 @@
 #include "examples/struct_type_modifiers.h"
 
 spec("fancy") {
+  it("should support dynamicly growing arrays") {
+    fancy_array(int) test = fancy_array_alloc(int, 4);
+    check(fancy_array_count(test) == 0);
+    check(fancy_array_capacity(test) == 4);
+    for (int i = 0; i < 5; ++i) {
+      fancy_array_push(test, i);
+    }
+    check(test.at(0) == 0);
+    check(test.at(4) == 4);
+    check(fancy_array_count(test) == 5);
+  }
   it("should compute area of the rectangle") {
     Rect rect = {42, 10};
     check(area(&rect) == 420);

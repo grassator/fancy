@@ -248,6 +248,104 @@
 #include "fancy_default_traits.h"
 
 //////////////////////////////////////////////////////////////////////////////
+// Array
+//////////////////////////////////////////////////////////////////////////////
+
+typedef struct {
+  char *next_free;
+  char *after_last;
+  char items[];
+} Fancy_Array_Internal;
+
+#define fancy_array_typedef_internal(_type_, _suffix_)\
+  typedef union {\
+    Fancy_Array_Internal *internal;\
+    struct CONCAT(Fancy_Array_Internal__, _suffix_) {\
+      _type_ *next_free;\
+      _type_ *after_last;\
+      _type_ items[];\
+    } *array;\
+  } CONCAT(Fancy_Array__, _suffix_)
+
+#define fancy_array_typedef(_type_)\
+  fancy_array_typedef_internal(_type_, _type_)
+
+fancy_array_typedef_internal(float, float);
+fancy_array_typedef_internal(double, double);
+fancy_array_typedef_internal(char, char);
+fancy_array_typedef_internal(int, int);
+fancy_array_typedef_internal(long, long);
+fancy_array_typedef_internal(long long, long_long);
+fancy_array_typedef_internal(unsigned char, unsigned_char);
+fancy_array_typedef_internal(unsigned int, unsigned_int);
+fancy_array_typedef_internal(unsigned long, unsigned_long);
+fancy_array_typedef_internal(unsigned long long, unsigned_long_long);
+
+Fancy_Array_Internal *
+fancy_array_realloc_internal(
+  Fancy_Array_Internal *internal,
+  size_t item_size,
+  size_t item_count
+) {
+  size_t new_allocation_size = sizeof(Fancy_Array_Internal) + item_count * item_size;
+  Fancy_Array_Internal *result = realloc(internal, new_allocation_size);
+  if (result) {
+    result->next_free = result->items;
+    result->after_last = result->items + item_count * item_size;
+  } else {
+    free(internal);
+  }
+  return result;
+}
+
+void
+fancy_array_increase_capacity(
+  Fancy_Array_Internal **internal,
+  size_t item_size
+) {
+  size_t current_capacity = ((*internal)->after_last - (*internal)->items) / item_size;
+  size_t new_capacity = current_capacity + current_capacity / 2;
+  size_t next_free_offset = (*internal)->next_free - (*internal)->items;
+  *internal = fancy_array_realloc_internal(*internal, item_size, new_capacity);
+  if (*internal) {
+    (*internal)->next_free += next_free_offset;
+  }
+}
+
+inline void
+fancy_array_ensure_capacity(
+  Fancy_Array_Internal **internal,
+  size_t item_size,
+  size_t extra_item_count
+) {
+  while (((*internal)->next_free + extra_item_count * item_size) > (*internal)->after_last) {
+    fancy_array_increase_capacity(internal, item_size);
+  }
+}
+
+#define fancy_array(_type_) CONCAT(Fancy_Array__, _type_)
+#define fancy_array_alloc(_type_, _count_)\
+  ((CONCAT(Fancy_Array__, _type_)) {\
+    .internal = fancy_array_realloc_internal(0, sizeof(_type_), _count_), \
+  })
+#define fancy_array_push(_array_, _value_)\
+  do {\
+    fancy_array_ensure_capacity(&((_array_).internal), sizeof((_array_).array->items[0]), 1);\
+    (*(_array_).array->next_free++ = _value_);\
+  } while(0)
+
+#define fancy_array_capacity(_array_)\
+  (((_array_).internal->after_last - (_array_).internal->items) / sizeof((_array_).array->items[0]))
+
+#define fancy_array_count(_array_)\
+  (((_array_).internal->next_free - (_array_).internal->items) / sizeof((_array_).array->items[0]))
+
+#define fancy_array_get(_array_, _index_)\
+  (&(_array_).array->items[_index_])
+
+#define at(_index_) array->items[_index_]
+
+//////////////////////////////////////////////////////////////////////////////
 // Type_Info
 //////////////////////////////////////////////////////////////////////////////
 
