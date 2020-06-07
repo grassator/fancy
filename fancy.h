@@ -241,6 +241,9 @@
 #define cast_to_trait(_trait_, _value_) \
   ((const _trait_) {instance(_trait_, _value_), _value_})
 
+#define fancy_cast_pointer_value(_ptr_, _to_)\
+  ((_to_) + ((int64_t)(_ptr_) - (int64_t)(_to_)) / sizeof(_to_))
+
 //////////////////////////////////////////////////////////////////////////////
 // Default Traits
 //////////////////////////////////////////////////////////////////////////////
