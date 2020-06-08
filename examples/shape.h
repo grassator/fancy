@@ -34,9 +34,16 @@
   FIELD(TYPE(int), height)
 
 #define TRAITS\
+  TRAIT(Comparable)\
   TRAIT(Type_Info)
 
 #include "fancy_struct.h"
+
+inline int IMPL(Comparable, compare)(const Self *self, const Self *other) {
+  return (
+    self->width * self->height - other->width * other->height
+  );
+}
 
 #undef Self
 

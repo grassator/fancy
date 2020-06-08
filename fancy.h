@@ -148,7 +148,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define TRAIT_HELPER(_trait_, _type_) \
-  CONCAT(Trait__##_trait_##__, _type_) *Trait__##_trait_[DISPATCH_ENUM_ENTRY(Trait__##_trait_, _type_)];
+  const CONCAT(Trait__##_trait_##__, _type_)\
+    *Trait__##_trait_[DISPATCH_ENUM_ENTRY(Trait__##_trait_, _type_)];
 
 #define STRINGIFY_HELPER(S) #S
 #define STRINGIFY(S) STRINGIFY_HELPER(S)
@@ -414,10 +415,10 @@ fancy_array_ensure_capacity(
       &CONCAT(VTable__Implementation__, _type_), 0, sizeof(_type_), _count_\
     ),\
   })
-#define fancy_array_push(_array_, _value_)\
+#define fancy_array_push(_array_, ...)\
   do {\
     fancy_array_ensure_capacity(&((_array_).internal), sizeof((_array_).array->items[0]), 1);\
-    (*(_array_).array->next_free++ = _value_);\
+    (*(_array_).array->next_free++ = (##__VA_ARGS__));\
   } while(0)
 
 #define fancy_array_capacity(_array_)\
@@ -432,7 +433,7 @@ fancy_array_ensure_capacity(
     (_array_).array->items,\
     fancy_array_count(test),\
     sizeof((_array_).array->items[0]),\
-    (_array_).array->vtable->Trait__Comparable->compare_\
+    (_array_).array->vtable->Trait__Comparable[0].compare_\
   );
 
 #define fancy_array_get(_array_, _index_)\

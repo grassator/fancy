@@ -1,4 +1,7 @@
+#ifndef MACRO_DEBUG
 #include "bdd-for-c.h"
+#endif
+
 #include "fancy.h"
 #include "examples/shape.h"
 #include "examples/enum.h"
@@ -26,6 +29,14 @@ spec("fancy") {
     check(test.at(0) == 2);
     check(test.at(1) == 6);
     check(test.at(2) == 9);
+  }
+
+  it("should be possible to sort arrays of custom types") {
+    fancy_array(Geometry_Size) test = fancy_array_alloc(Geometry_Size, 10);
+    fancy_array_push(test, (Geometry_Size){20, 3});
+    fancy_array_push(test, (Geometry_Size){4, 4});
+    fancy_array_sort(test);
+    check(test.at(0).width == 4);
   }
 
   it("should compute area of the rectangle") {

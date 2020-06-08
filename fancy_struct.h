@@ -1,5 +1,6 @@
 typedef struct CONCAT(VTable__, Self) {
-  #define TRAIT(_trait_) TRAIT_HELPER(_trait_, Self)
+  #define TRAIT(_trait_)\
+    const CONCAT(CONCAT(Trait__, _trait_), CONCAT(__, Self)) *CONCAT(Trait__, _trait_);
   TRAITS
   #undef TRAIT
   // @VTableFiller
@@ -11,7 +12,8 @@ typedef struct CONCAT(VTable__, Self) {
 const CONCAT(VTable__, Self) CONCAT(VTable__Implementation__, Self) = {
   #define TRAIT(_trait_)\
     .CONCAT(Trait__,_trait_) =\
-      &CONCAT(CONCAT(CONCAT(Trait__,_trait_), __Implementation__), _type_),
+      &CONCAT(CONCAT(CONCAT(Trait__,_trait_), __Implementation__), Self),
+  TRAITS
   #undef TRAIT
   .fancy_vtable_filler = 0, // @VTableFiller
 };
@@ -35,7 +37,12 @@ typedef struct Self {
   #undef TYPE
   #undef UNSIGNED
     };
-    CONCAT(VTable__, Self) *fancy_traits;
+    struct {
+      #define TRAIT(_trait_) TRAIT_HELPER(_trait_, Self)
+      TRAITS
+      #undef TRAIT
+      void *fancy_vtable_filler; // @VTableFiller
+    } *fancy_traits;
   };
 } Self;
 
@@ -101,6 +108,9 @@ static const Type_Info_Type CONCAT(Self, __type_info) = {
 inline const Type_Info_Type * IMPL(Type_Info, type_info)(Self *self) {
   return &CONCAT(Self, __type_info);
 }
+
+fancy_array_typedef(Self);
+
 #endif
 
 #undef FIELDS
