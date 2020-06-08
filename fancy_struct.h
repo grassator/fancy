@@ -1,9 +1,20 @@
-
-typedef struct {
+typedef struct CONCAT(VTable__, Self) {
   #define TRAIT(_trait_) TRAIT_HELPER(_trait_, Self)
   TRAITS
   #undef TRAIT
+  // @VTableFiller
+  // This is required if type has no traits leading
+  // to a zero-sized struct that is not allowed in C
+  void *fancy_vtable_filler;
 } CONCAT(VTable__, Self);
+
+const CONCAT(VTable__, Self) CONCAT(VTable__Implementation__, Self) = {
+  #define TRAIT(_trait_)\
+    .CONCAT(Trait__,_trait_) =\
+      &CONCAT(CONCAT(CONCAT(Trait__,_trait_), __Implementation__), _type_),
+  #undef TRAIT
+  .fancy_vtable_filler = 0, // @VTableFiller
+};
 
 // Anonymous unions and structs in declaration is only compatible with C11,
 // but it is also a known GNU extension and is supported in a bunch of
