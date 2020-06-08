@@ -221,17 +221,18 @@ typedef unsigned int unsigned_int;
 typedef unsigned long unsigned_long;
 typedef unsigned long long unsigned_long_long;
 
+// TODO Maybe IMPLEMENTATION_PRIMITIVE would be a better option
 #define TRAIT_IMPLEMENTATIONS\
-  IMPLEMENTATION(C(float))\
-  IMPLEMENTATION(C(double))\
-  IMPLEMENTATION(C(char))\
-  IMPLEMENTATION(C(int))\
-  IMPLEMENTATION(C(long))\
-  IMPLEMENTATION(C(long_long))\
-  IMPLEMENTATION(C(unsigned_char))\
-  IMPLEMENTATION(C(unsigned_int))\
-  IMPLEMENTATION(C(unsigned_long))\
-  IMPLEMENTATION(C(unsigned_long_long))\
+  IMPLEMENTATION_PRIMITIVE(float)\
+  IMPLEMENTATION_PRIMITIVE(double)\
+  IMPLEMENTATION_PRIMITIVE(char)\
+  IMPLEMENTATION_PRIMITIVE(int)\
+  IMPLEMENTATION_PRIMITIVE(long)\
+  IMPLEMENTATION_PRIMITIVE(long_long)\
+  IMPLEMENTATION_PRIMITIVE(unsigned_char)\
+  IMPLEMENTATION_PRIMITIVE(unsigned_int)\
+  IMPLEMENTATION_PRIMITIVE(unsigned_long)\
+  IMPLEMENTATION_PRIMITIVE(unsigned_long_long)\
   FANCY_COMPARABLE_TRAIT_IMPLEMENTATIONS
 
 inline int IMPL_TYPE(Comparable, compare, float)(
