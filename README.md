@@ -140,6 +140,7 @@ typedef union {
 inline void Bar__print(const Bar *bar) { puts(bar->bar_field); }
 
 const print_fn print__dispatcher[] = {
+    0, // DUMMY
     [Print__Dispatcher__Foo] = (print_fn) Foo__print,
     [Print__Dispatcher__Bar] = (print_fn) Bar__print,
 };
