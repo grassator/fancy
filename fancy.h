@@ -221,7 +221,6 @@ typedef unsigned int unsigned_int;
 typedef unsigned long unsigned_long;
 typedef unsigned long long unsigned_long_long;
 
-// TODO Maybe IMPLEMENTATION_PRIMITIVE would be a better option
 #define TRAIT_IMPLEMENTATIONS\
   IMPLEMENTATION_PRIMITIVE(float)\
   IMPLEMENTATION_PRIMITIVE(double)\

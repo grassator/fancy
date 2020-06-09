@@ -1,3 +1,7 @@
+#ifndef TRAITS
+#define TRAITS
+#endif
+
 typedef struct CONCAT(VTable__, Self) {
   #define TRAIT(_trait_)\
     const CONCAT(CONCAT(Trait__, _trait_), CONCAT(__, Self)) *CONCAT(Trait__, _trait_);
