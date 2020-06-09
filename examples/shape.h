@@ -9,8 +9,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #define TRAIT_FUNCTIONS(Self)\
-  TRAIT_FUNCTION(int, area,      Self)\
-  TRAIT_FUNCTION(int, perimeter, Self)
+  TRAIT_FUNCTION(int, area,      Self, const Self *)\
+  TRAIT_FUNCTION(int, perimeter, Self, const Self *)
 
 #define area(self)      fancy_invoke(Shape, area,      self)
 #define perimeter(self) fancy_invoke(Shape, perimeter, self)
@@ -60,11 +60,11 @@ inline int IMPL(Comparable, compare)(const Self *self, const Self *other) {
 
 #include "fancy_struct.h"
 
-inline int IMPL(Shape, area)(Self *self) {
+inline int IMPL(Shape, area)(const Self *self) {
   return self->size.width * self->size.height;
 }
 
-inline int IMPL(Shape, perimeter)(Self *self) {
+inline int IMPL(Shape, perimeter)(const Self *self) {
   return self->size.width * 2 + self->size.height * 2;
 }
 
@@ -87,11 +87,11 @@ inline int IMPL(Shape, perimeter)(Self *self) {
 
 #define CIRCLE_PI 3.14159265358979323846
 
-inline int IMPL(Shape, area) (Self *self) {
+inline int IMPL(Shape, area) (const Self *self) {
   return (int)(CIRCLE_PI * self->radius * self->radius);
 }
 
-inline int IMPL(Shape, perimeter)(Self *self) {
+inline int IMPL(Shape, perimeter)(const Self *self) {
   return (int)(2.0 * CIRCLE_PI * self->radius);
 }
 #undef Self
